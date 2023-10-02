@@ -1,0 +1,19 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Page title
+{% endblock %}
+
+{% block content %}
+<h1>{{ encoded_word }}</h1>
+    {% for k,v in alphabet_to_emoji.items %}
+        <h1>{{ k }}: {{ v }}</h1>
+    {% endfor %}
+   {% for i in emojis %}
+       {{ forloop.counter }}: <span class="display-1">{{ i }}</span>
+    {% endfor %}
+
+    {% next_button %}
+
+{% endblock %}

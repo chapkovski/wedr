@@ -1,0 +1,4 @@
+
+otree==3.4.0
+#psycopg2>=2.8.4
+emojis
