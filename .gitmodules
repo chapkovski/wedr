@@ -1,0 +1,3 @@
+[submodule "wedr-front"]
+	path = wedr-front
+	url = ./wedr-front
