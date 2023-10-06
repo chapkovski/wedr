@@ -6,13 +6,11 @@ import logging
 logger=logging.getLogger(__name__)
 
 class MyPage(Page):
-    def vars_for_template(self):
-        logger.critical(emojis.db.get_categories())
-        res=encode_word_with_alphabet('hello')
-        return {
+    def js_vars(self):
+        word = Constants.words[self.round_number - 1]
+        res = encode_word_with_alphabet(word)
 
-            **res
-        }
+        return res
 
 
 class ResultsWaitPage(WaitPage):
@@ -23,4 +21,6 @@ class Results(Page):
     pass
 
 
-page_sequence = [MyPage, ResultsWaitPage, Results]
+page_sequence = [MyPage,
+                 # ResultsWaitPage, Results
+                 ]

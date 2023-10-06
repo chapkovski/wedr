@@ -2,18 +2,25 @@
 {% load otree static %}
 
 {% block title %}
-    Page title
+   Round {{ view.round_number }} of {{ Constants.num_rounds }}
 {% endblock %}
 
 {% block content %}
-<h1>{{ encoded_word }}</h1>
-    {% for k,v in alphabet_to_emoji.items %}
-        <h1>{{ k }}: {{ v }}</h1>
-    {% endfor %}
-   {% for i in emojis %}
-       {{ forloop.counter }}: <span class="display-1">{{ i }}</span>
-    {% endfor %}
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+
+  <script type="module" crossorigin src="{% static 'front/index.js'  %}"></script>
+  <link rel="stylesheet" href="{% static 'front/index.css'  %}">
+
+
+   <style>
+    div#app{padding: 0px!important;}
+  </style>
+  <div id="app"></div>
+
+</body>
 
     {% next_button %}
 
 {% endblock %}
+
+
