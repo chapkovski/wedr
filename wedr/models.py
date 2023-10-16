@@ -69,7 +69,8 @@ class Player(BasePlayer):
             utc_time=data['utcTime'],
             owner=player,
             input=data['input'],
-            input_index=data['inputIndex']
+            input_index=data['inputIndex'],
+            since_last_input=data['sinceLastInput']
         )
 
 
@@ -78,3 +79,12 @@ class Input(djmodels.Model):
     owner = djmodels.ForeignKey(to=Player, on_delete=djmodels.CASCADE, related_name='inputs')
     input = models.StringField()
     input_index=models.IntegerField()
+    since_last_input=models.FloatField()
+
+def custom_export(players):
+    #we'll need to get for each player all its inputs
+    inputs = Input.objects.all()
+    yield ['session_code', 'participant_code',  'input_index', 'input', 'utc_time', 'since_last_input']
+    for p in players:
+        for i in p.inputs.all():
+            yield [p.session.code, p.participant.code,   i.input_index, i.input, i.utc_time, i.since_last_input]
