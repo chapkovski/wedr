@@ -8,10 +8,12 @@ from otree.api import (
     Currency as c,
     currency_range,
 )
-
+from django.db import models as djmodels
 from random import choices, sample
 import emojis
-
+from dateutil import parser
+from datetime import datetime
+import pytz
 import logging
 
 logger = logging.getLogger(__name__)
@@ -45,7 +47,7 @@ class Constants(BaseConstants):
     name_in_url = 'wedr'
     players_per_group = None
     num_rounds = 10
-    words = ['orange', 'banana', 'cherry', 'grapes', 'pencil', 'eraser', 'mirror', 'window', 'bottle', 'laptop']
+    words = ['elefant', 'banana', 'cherry', 'grapes', 'pencil', 'eraser', 'mirror', 'window', 'bottle', 'laptop']
 
 
 class Subsession(BaseSubsession):
@@ -57,4 +59,22 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    pass
+    time_elapsed=models.FloatField()
+    start_time=djmodels.DateTimeField(null=True)
+    end_time=djmodels.DateTimeField(null=True)
+
+    def process_input(player, data):
+        print(f"Got data: {data}")
+        Input.objects.create(
+            utc_time=data['utcTime'],
+            owner=player,
+            input=data['input'],
+            input_index=data['inputIndex']
+        )
+
+
+class Input(djmodels.Model):
+    utc_time = djmodels.DateTimeField()
+    owner = djmodels.ForeignKey(to=Player, on_delete=djmodels.CASCADE, related_name='inputs')
+    input = models.StringField()
+    input_index=models.IntegerField()
