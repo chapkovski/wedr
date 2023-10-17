@@ -11,9 +11,7 @@ from otree.api import (
 from django.db import models as djmodels
 from random import choices, sample
 import emojis
-from dateutil import parser
-from datetime import datetime
-import pytz
+
 import logging
 
 logger = logging.getLogger(__name__)
