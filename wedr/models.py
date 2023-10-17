@@ -69,6 +69,7 @@ class Player(BasePlayer):
 
     def process_input(player, data):
         print(f"Got data: {data}")
+        return {0:'jopa'}
         Input.objects.create(
             utc_time=data['utcTime'],
             owner=player,
