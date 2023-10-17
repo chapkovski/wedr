@@ -7,6 +7,18 @@ SESSION_CONFIGS = [
        num_demo_participants=2,
        app_sequence=['wedr']
     ),
+    dict(
+        name='full',
+        display_name="full",
+        num_demo_participants=2,
+        app_sequence=['wedr','q']
+    ),
+    dict(
+        name='q',
+        display_name="q only",
+        num_demo_participants=2,
+        app_sequence=['q']
+    ),
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
@@ -15,6 +27,8 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
+    prolific_return_url="https://app.prolific.com/submissions/complete?cc=NO_CODE",
+    for_prolific=True,
     real_world_currency_per_point=1.00, participation_fee=0.00, doc=""
 )
 

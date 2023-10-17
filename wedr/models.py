@@ -18,6 +18,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# TODO:
+# 1. progrfess bar
+# 2. insert page with instructions
+# 3. popup button at the working page
+# 4. popup confirming success when the word is submitted correctly
+
 
 def encode_word_with_alphabet(word):
     # List of example emojis categorized under 'People & Body' for demonstration
