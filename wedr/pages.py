@@ -39,6 +39,7 @@ class WorkingPage(Page):
         return super().post()
 
 
-page_sequence = [Intro,
+page_sequence = [
+    # Intro,
                  WorkingPage,
                  ]

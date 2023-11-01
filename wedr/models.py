@@ -69,12 +69,13 @@ class Player(BasePlayer):
     end_time = djmodels.DateTimeField(null=True)
 
     def handle_message(self, data):
-        print('Got message')
+        print('Got message', data)
         Message.objects.create(
             utc_time=data['utcTime'],
             owner=self,
             message=data['message'],
         )
+        return {0: {'type': 'message', 'who': self.participant.code, 'message': data['message']}}
 
     def handle_input(self, data):
         print('Got input')
@@ -86,14 +87,18 @@ class Player(BasePlayer):
             since_last_input=data['sinceLastInput']
         )
 
+
     def process_data(player, data):
         print(f"Got data: {data}")
-        if data.get('type') == 'message':
+        type=data.get('type')
+        data=data.get('data')
+        if type == 'message':
             resp = player.handle_message(data)
             return {0: resp}
 
-        elif data.get('type') == 'input':
+        elif  type == 'input':
             player.handle_input(data)
+
 
 
 class Input(djmodels.Model):
