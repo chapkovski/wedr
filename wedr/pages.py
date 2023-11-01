@@ -13,7 +13,7 @@ class Intro(Page):
 
 
 class WorkingPage(Page):
-    live_method = 'process_input'
+    live_method = 'process_data'
 
     def js_vars(self):
         word = Constants.words[self.round_number - 1]

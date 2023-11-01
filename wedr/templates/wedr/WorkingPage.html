@@ -2,31 +2,38 @@
 {% load otree static %}
 
 {% block title %}
-   Round {{ view.round_number }} of {{ Constants.num_rounds }}
+    Round {{ view.round_number }} of {{ Constants.num_rounds }}
 {% endblock %}
 
 {% block content %}
     <script>
+        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws"
+        const socket_url = "{{ view.live_url|safe }}"
+        const ws_path = `${ws_scheme}://${window.location.host}${socket_url}/`;
 
-    $(document).ready(function(){
-        window.socketUrl=socketUrl
-        window.liveSend=liveSend
+        window.fullPath = ws_path;
 
-    }
-    )
+        $(document).ready(function () {
+
+                window.liveSend = liveSend;
+
+            }
+        )
     </script>
-<link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
 
-  <script type="module" crossorigin src="{% static 'front/index.js'  %}"></script>
-  <link rel="stylesheet" href="{% static 'front/index.css'  %}">
+    <script type="module" crossorigin src="{% static 'front/index.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'front/index.css' %}">
 
 
-   <style>
-    div#app{padding: 0px!important;}
-  </style>
-  <div id="app"></div>
+    <style>
+        div#app {
+            padding: 0px !important;
+        }
+    </style>
+    <div id="app"></div>
 
-</body>
+    </body>
 
 
 
