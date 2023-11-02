@@ -11,7 +11,7 @@ from otree.api import (
 from django.db import models as djmodels
 from random import choices, sample
 import emojis
-
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -50,17 +50,26 @@ Your app description
 
 class Constants(BaseConstants):
     name_in_url = 'wedr'
-    players_per_group = None
+    players_per_group = 2
     num_rounds = 10
     words = ['elefant', 'banana', 'cherry', 'grapes', 'pencil', 'eraser', 'mirror', 'window', 'bottle', 'laptop']
 
 
 class Subsession(BaseSubsession):
-    pass
+    def creating_session(self):
+        for g in self.get_groups():
+            g.decoded_word = choices(Constants.words)[0]
+            res=encode_word_with_alphabet(g.decoded_word)
+            g.alphabet_to_emoji = json.dumps(res['alphabet_to_emoji'])
+            g.encoded_word = json.dumps(res['encoded_word'])
+
 
 
 class Group(BaseGroup):
-    pass
+    decoded_word = models.StringField()
+    encoded_word = models.StringField()
+    alphabet_to_emoji = models.StringField()
+
 
 
 class Player(BasePlayer):
@@ -73,6 +82,7 @@ class Player(BasePlayer):
         Message.objects.create(
             utc_time=data['utcTime'],
             owner=self,
+            owner_group=self.group,
             message=data['message'],
         )
         return {0: {'type': 'message', 'who': self.participant.code, 'message': data['message']}}
@@ -110,8 +120,10 @@ class Input(djmodels.Model):
 
 
 class Message(djmodels.Model):
+    meta = {'ordering': ['utc_time']}   # this is needed to get the messages in the right order
     utc_time = djmodels.DateTimeField()
     owner = djmodels.ForeignKey(to=Player, on_delete=djmodels.CASCADE, related_name='messages')
+    owner_group = djmodels.ForeignKey(to=Group, on_delete=djmodels.CASCADE, related_name='messages')
     message = models.StringField()
 
 

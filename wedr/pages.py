@@ -18,7 +18,17 @@ class WorkingPage(Page):
     def js_vars(self):
         word = Constants.words[self.round_number - 1]
         res = encode_word_with_alphabet(word)
-
+        messages= self.group.messages.all()
+        formatted_messages = [
+            {
+                "type": "message",
+                "who": i.owner.participant.code,
+                "message": i.message,
+                "own": i.owner == self.player,
+            }
+            for i in messages
+        ]
+        res.update({'messages': formatted_messages})
         return res
 
     def post(self):
