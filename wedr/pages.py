@@ -13,8 +13,10 @@ class FirstWP(WaitPage):
     def is_displayed(self):
         return self.round_number == 1
 
+
 class GameSettingWP(WaitPage):
     after_all_players_arrive = 'set_up_game'
+
 
 class Intro(Page):
     def is_displayed(self):
@@ -49,8 +51,9 @@ class WorkingPage(Page):
 
 
 page_sequence = [
-Intro,
+
     FirstWP,
+    Intro,
     GameSettingWP,
 
     WorkingPage,
