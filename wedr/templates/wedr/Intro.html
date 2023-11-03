@@ -2,12 +2,15 @@
 {% load otree static %}
 
 {% block title %}
-
+Instructions for the Word Decoding Task
 {% endblock %}
 
 {% block content %}
-    {% chat %}
+
 {%  include 'wedr/includes/instructions.html' %}
+
+    <h5 class="card-title my-3">Ready to Start?</h5>
+            <p>When you are ready, click the 'Next' button to begin the task.</p>
     {% next_button %}
 {% endblock %}
 

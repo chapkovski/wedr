@@ -49,8 +49,9 @@ class WorkingPage(Page):
 
 
 page_sequence = [
+Intro,
     FirstWP,
     GameSettingWP,
-    # Intro,
+
     WorkingPage,
 ]

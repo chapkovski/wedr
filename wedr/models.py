@@ -87,8 +87,8 @@ class Constants(BaseConstants):
     # we need to read words from data/words.txt
     with open('data/words.csv', 'r') as f:
         words = [i.strip() for i in f.readlines()]
-
-    num_rounds = 10
+    words = ['mandarin']
+    num_rounds = 1
     words = sample(words, k=num_rounds)
     print(words)
 

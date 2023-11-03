@@ -5,13 +5,18 @@
     Round {{ view.round_number }} of {{ Constants.num_rounds }}
 {% endblock %}
 
-{% block content %}
+{% block body_main %}
+    <div id="instructions" class="d-none">
+    {%  include 'wedr/includes/instructions.html' %}
+    </div>
     <script>
         window.groupDict = {{ group.alphabet_to_emoji|safe }};
         window.encodedWord = {{ group.encoded_word|safe }};
         window.partialDict = {{ player.partial_dict|safe }};
-        window.ownCode ="{{ participant.code|safe }}";
-        const liveRecv = ()=>{ console.debug('liveRecv not set') }
+        window.ownCode = "{{ participant.code|safe }}";
+        const liveRecv = () => {
+            console.debug('liveRecv not set')
+        }
         const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws"
         const socket_url = "{{ view.live_url|safe }}"
         const ws_path = `${ws_scheme}://${window.location.host}${socket_url}/`;
@@ -36,9 +41,10 @@
             padding: 0px !important;
         }
     </style>
-    <div id="app"></div>
+    <form class="otree-form" method="post" role="form" id="form" autocomplete="off">{% csrf_token %}
 
-    </body>
+        <div id="app"></div>
+    </form>
 
 
 
