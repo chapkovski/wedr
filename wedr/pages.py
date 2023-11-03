@@ -7,6 +7,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class FirstWP(WaitPage):
+    group_by_arrival_time = True
+
+    def is_displayed(self):
+        return self.round_number == 1
+
+class GameSettingWP(WaitPage):
+    after_all_players_arrive = 'set_up_game'
+
 class Intro(Page):
     def is_displayed(self):
         return self.round_number == 1
@@ -15,10 +24,13 @@ class Intro(Page):
 class WorkingPage(Page):
     live_method = 'process_data'
 
+    def is_displayed(self):
+        return not self.group.completed
+
     def js_vars(self):
         word = Constants.words[self.round_number - 1]
         res = encode_word_with_alphabet(word)
-        messages= self.group.messages.all()
+        messages = self.group.messages.all()
         formatted_messages = [
             {
                 "type": "message",
@@ -33,23 +45,12 @@ class WorkingPage(Page):
 
     def post(self):
         print(f'Got data: {self.request.POST}')
-        start_time = self.request.POST.get('startTime')
-        end_time = self.request.POST.get('endTime')
-        time_elapsed = float(self.request.POST.get('timeElapsed'))
-        if start_time and end_time and time_elapsed:
-            try:
-                self.player.start_time = start_time
-                self.player.end_time = end_time
-                self.player.time_elapsed = time_elapsed
-
-
-            except Exception as e:
-                print(e)
-                logger.error("Failed to set duration of decision page")
         return super().post()
 
 
 page_sequence = [
+    FirstWP,
+    GameSettingWP,
     # Intro,
-                 WorkingPage,
-                 ]
+    WorkingPage,
+]

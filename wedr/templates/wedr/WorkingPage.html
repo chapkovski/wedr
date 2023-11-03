@@ -9,7 +9,7 @@
     <script>
         window.groupDict = {{ group.alphabet_to_emoji|safe }};
         window.encodedWord = {{ group.encoded_word|safe }};
-        window.decodedWord = "{{ group.decoded_word|safe }}";
+        window.partialDict = {{ player.partial_dict|safe }};
         window.ownCode ="{{ participant.code|safe }}";
         const liveRecv = ()=>{ console.debug('liveRecv not set') }
         const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws"
