@@ -3,6 +3,7 @@ from ._builtin import Page, WaitPage
 from .models import Constants, encode_word_with_alphabet
 import emojis
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -11,9 +12,19 @@ logger = logging.getLogger(__name__)
 class GameSettingWP(WaitPage):
     template_name = 'wedr/FirstWP.html'
     group_by_arrival_time = True
-    body_text = "If you wait for more than 5 minutes, please submit NOPARTNER code in prolific and we will compensate you for your time! Thank you!"
-
+    min_to_wait =5
+    body_text = f"If you wait for more than {min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
     after_all_players_arrive = 'set_up_game'
+    def vars_for_template(self):
+        return dict(no_partner_url=self.session.config.get('no_partner_url'))
+    def js_vars(self):
+        # Get the current UTC time
+        current_utc_time = datetime.utcnow()
+
+        # Convert to a format that JavaScript can parse
+        utc_time_string = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+        current_time = self.participant.vars.setdefault( 'start_waiting_time', utc_time_string)
+        return {'currentTime': current_time, 'minToWait': self.min_to_wait}
 
 
 class WorkingPage(Page):

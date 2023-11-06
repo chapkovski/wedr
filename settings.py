@@ -30,6 +30,7 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
+    no_partner_url="https://app.prolific.co/submissions/complete?cc=NO_PARTNER",
     prolific_return_url="https://app.prolific.com/submissions/complete?cc=NO_CODE",
     for_prolific=True,
     real_world_currency_per_point=1.00, participation_fee=0.00, doc=""

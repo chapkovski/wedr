@@ -70,10 +70,10 @@ a.tick-credits{
     display: none;
 }
 </style>
-
+<div class="alert alert-info">{{ body_text }}</div>
 <div class="tick my-3" data-did-init="handleTickInit" id="ticker">
 
-    <div data-repeat="true" data-layout="horizontal fit" data-transform="preset(h, m, s) -> delay">
+    <div data-repeat="true" data-layout="horizontal fit" data-transform="preset( m, s) -> delay">
 
         <div class="tick-group">
 
@@ -95,21 +95,21 @@ a.tick-credits{
     <p>Time's up</p>
 </div>
 
-                <div id="linkToProlific" class="d-none">
-                    <a href="">CLICK HERE TO GET BACK TO PROLIFIC!
-                    WE"LL PAY FOR YOUR TIME</a>
+                <div id="linkToProlific" class="d-none text-center lead my-5">
+                 <a href="{{ no_partner_url }}" class="btn btn-primary">CLICK HERE TO GET BACK TO PROLIFIC! WE'LL PAY FOR YOUR TIME</a>
+
                 </div>
 <script>
     function handleTickInit(tick) {
 
-        // get timer offset (if not found, set to today)
-        var offset = new Date( localStorage.getItem('countdown-offset') || new Date() );
 
-        // store the offset (not really necessary but saves some if statements)
-        localStorage.setItem('countdown-offset', offset);
+        var offset = new Date(js_vars.currentTime);
+
+
+
 
         // time in hours the timer will run down
-        var timeDuration = Tick.helper.duration(10, 'seconds');
+        var timeDuration = Tick.helper.duration(js_vars.minToWait, 'minutes');
 
         // add 24 hours to get final deadline
         var deadline = new Date( offset.setMilliseconds( offset.getMilliseconds() + timeDuration ) );
