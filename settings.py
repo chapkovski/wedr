@@ -1,5 +1,5 @@
 from os import environ
-
+EXTENSION_APPS = ["wedr"]
 SESSION_CONFIGS = [
     dict(
        name='wedr',
