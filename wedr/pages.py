@@ -47,15 +47,15 @@ class WorkingPage(Page):
         return res
 
     def post(self):
-        print(f'Got data: {self.request.POST}')
+        logger.info(f'Got data: {self.request.POST}')
         return super().post()
 
 
 page_sequence = [
 
-    FirstWP,
-    Intro,
-    CQPage,
+    # FirstWP,
+    # Intro,
+    # CQPage,
     GameSettingWP,
     WorkingPage,
 ]
