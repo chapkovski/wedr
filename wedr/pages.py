@@ -21,7 +21,8 @@ class GameSettingWP(WaitPage):
 class Intro(Page):
     def is_displayed(self):
         return self.round_number == 1
-
+class CQPage(Page):
+    pass
 
 class WorkingPage(Page):
     live_method = 'process_data'
@@ -54,7 +55,7 @@ page_sequence = [
 
     FirstWP,
     Intro,
+    CQPage,
     GameSettingWP,
-
     WorkingPage,
 ]
