@@ -16,7 +16,10 @@ import json
 import logging
 from collections import OrderedDict
 logger = logging.getLogger(__name__)
-
+# TODO
+# ADD IN INSTRUCTIONS AND CQS INFORMATION
+# 1. ABOUT SUBMITTION (THEY WILL PROCEED AUTOMATICALLY AS SOON AS THEY ENTER)
+# 2. ONCE AGAIN SOME LETTERS ARE *MISSING* FROM THE USER'S SET OF LETTERS
 
 # TODO:
 # 1. progrfess bar

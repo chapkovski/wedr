@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class GameSettingWP(WaitPage):
+    template_name = 'wedr/FirstWP.html'
     group_by_arrival_time = True
     body_text = "If you wait for more than 5 minutes, please submit NOPARTNER code in prolific and we will compensate you for your time! Thank you!"
 

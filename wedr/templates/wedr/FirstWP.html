@@ -1,0 +1,142 @@
+{% extends 'otree/WaitPage.html' %}
+{% load i18n %}
+{% load otree %}
+
+
+            {% block content %}
+                <link href="https://unpkg.com/@pqina/flip/dist/flip.min.css" rel="stylesheet">
+                <script src="https://unpkg.com/@pqina/flip/dist/flip.min.js"></script>
+           <style>
+.tick {
+  font-size:1rem; white-space:nowrap; font-family:arial,sans-serif;
+}
+
+.tick-flip,.tick-text-inline {
+  font-size:2.5em;
+}
+
+.tick-label {
+  margin-top:1em;font-size:1em;
+}
+
+.tick-char {
+  width:1.5em;
+}
+
+.tick-text-inline {
+  display:inline-block;text-align:center;min-width:1em;
+}
+
+.tick-text-inline+.tick-text-inline {
+  margin-left:-.325em;
+}
+
+.tick-group {
+  margin:0 .5em;text-align:center;
+}
+
+body {
+   background-color: rgb(255, 255, 255) !important;
+}
+
+.tick-text-inline {
+   color: rgb(90, 93, 99) !important;
+}
+
+.tick-label {
+   color: rgb(90, 93, 99) !important;
+}
+
+.tick-flip-panel {
+   color: rgb(255, 255, 255) !important;
+}
+
+.tick-flip {
+   font-family: !important;
+}
+
+.tick-flip-panel-text-wrapper {
+   line-height: 1.45 !important;
+}
+
+.tick-flip-panel {
+   background-color: rgb(59, 61, 59) !important;
+}
+
+.tick-flip {
+   border-radius:0.12em !important;
+}
+a.tick-credits{
+    display: none;
+}
+</style>
+
+<div class="tick my-3" data-did-init="handleTickInit" id="ticker">
+
+    <div data-repeat="true" data-layout="horizontal fit" data-transform="preset(h, m, s) -> delay">
+
+        <div class="tick-group">
+
+            <div data-key="value" data-repeat="true" data-transform="pad(00) -> split -> delay">
+
+                <span data-view="flip"></span>
+
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="tick-onended-message" style="display:none">
+    <p>Time's up</p>
+</div>
+
+                <div id="linkToProlific" class="d-none">
+                    <a href="">CLICK HERE TO GET BACK TO PROLIFIC!
+                    WE"LL PAY FOR YOUR TIME</a>
+                </div>
+<script>
+    function handleTickInit(tick) {
+
+        // get timer offset (if not found, set to today)
+        var offset = new Date( localStorage.getItem('countdown-offset') || new Date() );
+
+        // store the offset (not really necessary but saves some if statements)
+        localStorage.setItem('countdown-offset', offset);
+
+        // time in hours the timer will run down
+        var timeDuration = Tick.helper.duration(10, 'seconds');
+
+        // add 24 hours to get final deadline
+        var deadline = new Date( offset.setMilliseconds( offset.getMilliseconds() + timeDuration ) );
+
+        // create counter
+        var counter = Tick.count.down(deadline, { format: ['m', 's'] } );
+
+        // update tick with the counter value
+        counter.onupdate = function(value) {
+            tick.value = value;
+        };
+
+        counter.onended = function() {
+            $('#linkToProlific').removeClass('d-none')
+            $('#ticker').addClass('d-none')
+            // redirect, uncomment the next line
+            // window.location = 'my-location.html'
+
+            // hide counter, uncomment the next line
+            // tick.root.style.display = 'none';
+
+            // show message, uncomment the next line
+            // document.querySelector('.tick-onended-message').style.display = '';
+        };
+    }
+</script>
+
+            {% endblock %}
+
+
