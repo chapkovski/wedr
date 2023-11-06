@@ -7,22 +7,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FirstWP(WaitPage):
-    group_by_arrival_time = True
-
-    def is_displayed(self):
-        return self.round_number == 1
-
 
 class GameSettingWP(WaitPage):
+    group_by_arrival_time = True
+    body_text = "If you wait for more than 5 minutes, please submit NOPARTNER code in prolific and we will compensate you for your time! Thank you!"
+
     after_all_players_arrive = 'set_up_game'
 
-
-class Intro(Page):
-    def is_displayed(self):
-        return self.round_number == 1
-class CQPage(Page):
-    pass
 
 class WorkingPage(Page):
     live_method = 'process_data'
@@ -53,9 +44,7 @@ class WorkingPage(Page):
 
 page_sequence = [
 
-    FirstWP,
-    Intro,
-    CQPage,
+
     GameSettingWP,
     WorkingPage,
 ]

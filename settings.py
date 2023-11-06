@@ -2,17 +2,20 @@ from os import environ
 EXTENSION_APPS = ["wedr"]
 SESSION_CONFIGS = [
     dict(
+        name='full',
+        display_name="full",
+        num_demo_participants=2,
+        app_sequence=[
+            'start',
+            'wedr', 'q']
+    ),
+    dict(
        name='wedr',
        display_name="wedr",
        num_demo_participants=2,
        app_sequence=['wedr']
     ),
-    dict(
-        name='full',
-        display_name="full",
-        num_demo_participants=2,
-        app_sequence=['wedr','q']
-    ),
+
     dict(
         name='q',
         display_name="q only",
