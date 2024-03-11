@@ -12,7 +12,7 @@ SESSION_CONFIGS = [
     dict(
        name='wedr',
        display_name="wedr",
-       num_demo_participants=2,
+       num_demo_participants=4,
        app_sequence=['wedr']
     ),
 

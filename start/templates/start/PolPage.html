@@ -1,0 +1,20 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+   <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/survey-jquery@1.9.115/survey.jquery.min.js"></script>
+    <script src="https://unpkg.com/survey-jquery@1.9.115/themes/index.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/survey-jquery@1.9.115/defaultV2.min.css" />
+    <input type="hidden" id="survey_data" value="" name="survey_data">
+    <div id="surveyElement" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+    <script src="{% static 'wedr/pol_json.js' %}"></script>
+    <script src="{% static 'wedr/cq_index.js' %}"></script>
+    {% next_button %}
+{% endblock %}
+
+

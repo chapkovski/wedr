@@ -34,4 +34,4 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    pass
+    survey_data = models.LongStringField()

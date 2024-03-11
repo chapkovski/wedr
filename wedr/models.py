@@ -15,6 +15,8 @@ import emojis
 import json
 import logging
 from collections import OrderedDict
+# let's import cycle
+
 logger = logging.getLogger(__name__)
 # TODO
 # ADD IN INSTRUCTIONS AND CQS INFORMATION
@@ -115,6 +117,8 @@ author = 'Philipp Chapkovski, UBonn, chapkovski@gmail.com'
 doc = """
 Your app description
 """
+# let's read data/polquestions.csv
+import csv
 
 
 class Constants(BaseConstants):
@@ -123,10 +127,13 @@ class Constants(BaseConstants):
     # we need to read words from data/words.txt
     with open('data/words.csv', 'r') as f:
         words = [i.strip() for i in f.readlines()]
-    words = ['mandarin']
+    # words = ['mandarin']
     num_rounds = 1
     words = sample(words, k=num_rounds)
-    print(words)
+    treatments = ['neutral', 'polarizing']
+    with open('data/polquestions.csv', 'r') as f:
+        statements = list(csv.DictReader(f))
+
 
 
 class Subsession(BaseSubsession):
@@ -144,7 +151,8 @@ class Group(BaseGroup):
         p1 = g.get_player_by_id(1)
         p2 = g.get_player_by_id(2)
         p1.partial_dict, p2.partial_dict = split_alphabet_for_decoding(g.decoded_word, res['alphabet_to_emoji'])
-
+        g.treatment = Constants.treatments[g.id_in_subsession % 2]
+    treatment = models.StringField()
     decoded_word = models.StringField()
     encoded_word = models.StringField()
     alphabet_to_emoji = models.StringField()

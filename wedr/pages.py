@@ -53,10 +53,20 @@ class WorkingPage(Page):
         logger.info(f'Got data: {self.request.POST}')
         return super().post()
 
+class MatchPage(Page):
+    def vars_for_template(self):
+        treatment = self.group.treatment
+        statements = [i for i in Constants.statements if i['treatment'] == treatment]
+        return dict(statements=statements)
+class PartnerWP(WaitPage):
+    pass
+
 
 page_sequence = [
 
 
     GameSettingWP,
+    MatchPage,
+    PartnerWP,
     WorkingPage,
 ]
