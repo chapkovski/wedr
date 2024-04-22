@@ -202,9 +202,12 @@ class Player(BasePlayer):
             self.group.start_time = self.start_time
             self.group.end_time = self.completion_time
             self.group.time_elapsed = self.time_elapsed
+        if time is not over:
+            new_data = generate_new_word()
 
         return {'type': 'completed',
                 'who': self.participant.code,
+                'new_data': new_data,
                 'group_completed': self.group.completed}  # this is needed to trigger the completion of the page
 
     def process_data(player, data):
