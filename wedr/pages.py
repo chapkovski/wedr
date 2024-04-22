@@ -3,27 +3,29 @@ from ._builtin import Page, WaitPage
 from .models import Constants, encode_word_with_alphabet
 import emojis
 import logging
-from datetime import datetime
+import json
+from datetime import timedelta, datetime, timezone
 
 logger = logging.getLogger(__name__)
-
 
 
 class GameSettingWP(WaitPage):
     template_name = 'wedr/FirstWP.html'
     group_by_arrival_time = True
-    min_to_wait =5
+    min_to_wait = 5
     body_text = f"If you wait for more than {min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
     after_all_players_arrive = 'set_up_game'
+
     def vars_for_template(self):
         return dict(no_partner_url=self.session.config.get('no_partner_url'))
+
     def js_vars(self):
         # Get the current UTC time
         current_utc_time = datetime.utcnow()
 
         # Convert to a format that JavaScript can parse
         utc_time_string = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-        current_time = self.participant.vars.setdefault( 'start_waiting_time', utc_time_string)
+        current_time = self.participant.vars.setdefault('start_waiting_time', utc_time_string)
         return {'currentTime': current_time, 'minToWait': self.min_to_wait}
 
 
@@ -34,6 +36,17 @@ class WorkingPage(Page):
         return not self.group.completed
 
     def js_vars(self):
+        time_to_go = self.participant.vars.setdefault('time_to_go', (
+                datetime.now(timezone.utc) + timedelta(seconds=Constants.time_for_work)).timestamp())
+        main_dict = dict(
+            groupDict=json.loads(self.group.alphabet_to_emoji),
+            encodedWord=json.loads(self.group.encoded_word),
+            partialDict=json.loads(self.player.partial_dict),
+            ownCode=self.participant.code,
+            remaining_time=time_to_go - datetime.now(timezone.utc).timestamp()
+        )
+
+
         word = Constants.words[self.round_number - 1]
         res = encode_word_with_alphabet(word)
         messages = self.group.messages.all()
@@ -47,26 +60,29 @@ class WorkingPage(Page):
             for i in messages
         ]
         res.update({'messages': formatted_messages})
+        res.update(main_dict)
         return res
 
     def post(self):
         logger.info(f'Got data: {self.request.POST}')
         return super().post()
 
+
 class MatchPage(Page):
     def vars_for_template(self):
         treatment = self.group.treatment
         statements = [i for i in Constants.statements if i['treatment'] == treatment]
         return dict(statements=statements)
+
+
 class PartnerWP(WaitPage):
     pass
 
 
 page_sequence = [
 
-
     GameSettingWP,
-    MatchPage,
+    # MatchPage,
     PartnerWP,
     WorkingPage,
 ]

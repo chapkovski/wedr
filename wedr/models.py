@@ -131,6 +131,7 @@ class Constants(BaseConstants):
     num_rounds = 1
     words = sample(words, k=num_rounds)
     treatments = ['neutral', 'polarizing']
+    time_for_work = 60
     with open('data/polquestions.csv', 'r') as f:
         statements = list(csv.DictReader(f))
 

@@ -10,6 +10,7 @@
     {%  include 'wedr/includes/instructions.html' %}
     </div>
     <script>
+    window.standalone = true;
         window.groupDict = {{ group.alphabet_to_emoji|safe }};
         window.encodedWord = {{ group.encoded_word|safe }};
         window.partialDict = {{ player.partial_dict|safe }};
