@@ -1,47 +1,65 @@
+{% load static otree %}
 <div class="container my-3">
     <div class="card">
 
         <div class="card-body">
-            <div class="list-group">
-                <div class="list-group-item bg-danger text-white">
-                    ATTENTION! Please, remember: if your partner leaves the chat and does not respond you anymore,
-                    you can submit any code on Prolific and we'll pay you for your time!
-                </div>
+            <div class="list-group list-group-flush">
+                {% if show_warning|default_if_none:False %}
+                    <div class="list-group-item bg-danger text-white">
+                        ATTENTION! Please, remember: if your partner leaves the chat and does not respond you anymore,
+                        you can submit any code on Prolific and we'll pay you for your time!
+                    </div>
+                {% endif %}
                 <div class="list-group-item">
+                    {% if show_images|default_if_none:False %}
+                        <div class="border text-center">
+                            <img width="100%" src="{% static 'imgs/dict.png' %}" alt="Example of dictionary">
+                        </div>
+                    {% endif %}
                     <strong>Dictionary:</strong> At the top of the screen, you will see a dictionary that shows the
                     correspondence between each letter of the alphabet and a specific emoji. For example, if 😊
                     corresponds to 'A', every time you see 😊, it represents the letter 'A'.
                 </div>
                 <div class="list-group-item">
+                    {% if show_images|default_if_none:False %}
+                        <div class="border text-center">
+                            <img width="100%" style='max-width:200px' src="{% static 'imgs/input.png' %}"
+                                 alt="Example of input">
+                        </div>
+                    {% endif %}
+
                     <strong>Encoded Word:</strong> Below the dictionary, you will see a word that is encoded using these
                     emojis. For instance, if you see 😊😎👍, and 😊 corresponds to 'A', 😎 to 'B', and 👍 to 'C', the encoded
                     word is 'ABC'.
-                </div>
-                <div class="list-group-item my-3">
+                    <br>
                     <strong>Input Field:</strong> You will also see an input field where you can type in the decoded
                     word.
                 </div>
-                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">1. You will be paired up with
+                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">You will be paired up with
                     another Prolific user randomly.
                 </div>
-                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">2. Decipher an English word, each
+                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">Decipher an English word, each
                     letter encoded as a different emoji.
                 </div>
-                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">3. At your screen you have only half
+                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">At your screen you have only half
                     the letters/emojis of the word.
                 </div>
-                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">4. Your partner has the remaining
+                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">Your partner has the remaining
                     letters/emojis.
                 </div>
-                <div class="list-group-item font-weight-bold " style="border-bottom: 1px solid #ddd;">Remember, neither
+                <div class="list-group-item font-weight-bold " style="border-bottom: 1px solid #ddd;">
+                    Remember, neither
                     you nor your partner has all the letters needed to decode the word.
                 </div>
-                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">5. Discuss with your partner to
+                <div class="list-group-item" style="border-bottom: 1px solid #ddd;">Discuss with your partner to
                     exchange missing emojis and share your emoji-letter correspondences.
                 </div>
-                <div class="list-group-item" style=" font-weight:bold; border-bottom: 1px solid #ddd;">6. The game will
-                    automatically advance you and your partner to the next stage once both of you have independently
+                <div class="list-group-item" style=" font-weight:bold; border-bottom: 1px solid #ddd;">The game will
+                    automatically advance you and your partner to the next task once both of you have independently
                     submitted the correct word.
+                </div>
+                <div class="list-group-item" style="">
+                    Your goal is to decipher as many words as possible within the time limit.
                 </div>
 
             </div>

@@ -39,11 +39,9 @@ class WorkingPage(Page):
         if self.player.remaining_time <= 0:
             return False
         return not self.group.completed
-
+    def vars_for_template(self):
+        return dict(show_warning=True)
     def js_vars(self):
-        # todo: move to group level?
-        default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
-        time_to_go = self.participant.vars.setdefault('time_to_go', default_time.timestamp())
         main_dict = dict(
             groupDict=json.loads(self.group.alphabet_to_emoji),
             encodedWord=json.loads(self.group.encoded_word),

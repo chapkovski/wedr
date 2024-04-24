@@ -4,6 +4,7 @@ from .models import Constants
 import json
 from json import JSONDecodeError
 
+
 class FirstWP(WaitPage):
     group_by_arrival_time = True
     body_text = "If you wait for more than 5 minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
@@ -13,8 +14,13 @@ class FirstWP(WaitPage):
 
 
 class Intro(Page):
-    def is_displayed(self):
-        return self.round_number == 1
+    def vars_for_template(self):
+        return dict(minutes=int(self.session.config.get('time_for_work', 600) / 60))
+
+
+class Instructions(Page):
+    def vars_for_template(self):
+        return dict(show_images=True)
 
 
 class CQPage(Page):
@@ -28,7 +34,7 @@ class PolPage(Page):
     def post(self):
         raw_data = self.request.POST.get('survey_data')
         try:
-            json_data= json.loads(raw_data)
+            json_data = json.loads(raw_data)
             print(json_data)
             self.player.survey_data = json.dumps(json_data)
         except JSONDecodeError:
@@ -39,7 +45,8 @@ class PolPage(Page):
 
 page_sequence = [
     FirstWP,
-    PolPage,
+    # PolPage,
     Intro,
+    Instructions,
     CQPage,
 ]

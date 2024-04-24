@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 # 2. ONCE AGAIN SOME LETTERS ARE *MISSING* FROM THE USER'S SET OF LETTERS
 
 # TODO:
-# 1. progrfess bar
+
 # 2. insert page with instructions
-# 3. popup button at the working page
+
 # 4. popup confirming success when the word is submitted correctly
 
 

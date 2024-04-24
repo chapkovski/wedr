@@ -2,15 +2,46 @@
 {% load otree static %}
 
 {% block title %}
-Instructions for the Word Decoding Task
+    Welcome to our study!
 {% endblock %}
 
 {% block content %}
 
-{%  include 'wedr/includes/instructions.html' %}
+    <div class="card my-3">
 
-    <h5 class="card-title my-3">Ready to Start?</h5>
-            <p>When you are ready, click the 'Next' button to begin the task.</p>
+        <div class="card-body">
+            <div class="list-group list-group-flush">
+
+                <div class="list-group-item">
+                    In this study, you will be paired with another participant from Prolific. Together, you will tackle
+                    a series of simple puzzles. Detailed instructions will follow on the next page.
+                </div>
+                <div class="list-group-item">
+                    <b>Communication:</b> You will need to communicate with your partner through a chat interface to solve the
+                    puzzles effectively.
+                </div>
+                <div class="list-group-item ">
+                    <b>Objective: </b> Your goal is to solve as many puzzles as possible within the allotted time of {{ minutes }} minutes.
+                </div>
+
+                <div class="list-group-item lead text-center">
+                    Let’s get started!
+                </div>
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
     {% next_button %}
 {% endblock %}
 
