@@ -8,6 +8,7 @@ from otree.api import (
     Currency as c,
     currency_range,
 )
+from datetime import timedelta, datetime, timezone
 from django.db import models as djmodels
 from random import choices, sample
 import random
@@ -16,7 +17,7 @@ import json
 import logging
 from collections import OrderedDict
 # let's import cycle
-
+from pprint import pprint
 logger = logging.getLogger(__name__)
 # TODO
 # ADD IN INSTRUCTIONS AND CQS INFORMATION
@@ -127,11 +128,12 @@ class Constants(BaseConstants):
     # we need to read words from data/words.txt
     with open('data/words.csv', 'r') as f:
         words = [i.strip() for i in f.readlines()]
-    # words = ['mandarin']
-    num_rounds = 1
-    words = sample(words, k=num_rounds)
+
+    num_rounds = 3
+
+    assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
     treatments = ['neutral', 'polarizing']
-    time_for_work = 60
+
     with open('data/polquestions.csv', 'r') as f:
         statements = list(csv.DictReader(f))
 
@@ -142,17 +144,25 @@ class Subsession(BaseSubsession):
         pass
 
 class Group(BaseGroup):
+    def set_time_over(self):
+        default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
+        for p in self.get_players():
+            p.participant.vars['time_to_go'] =  default_time.timestamp()
+
+    def set_treatment(self):
+        self.set_time_over()
+        self.treatment = Constants.treatments[self.id_in_subsession % 2]
     def set_up_game(self):
         g=self
         # we need to encode the word and split the alphabet between the two players
-        g.decoded_word = choices(Constants.words)[0]
+        g.decoded_word = Constants.words[self.round_number-1] #choices(Constants.words)[0]
         res = encode_word_with_alphabet(g.decoded_word)
         g.alphabet_to_emoji = json.dumps(res['alphabet_to_emoji'])
         g.encoded_word = json.dumps(res['encoded_word'])
         p1 = g.get_player_by_id(1)
         p2 = g.get_player_by_id(2)
         p1.partial_dict, p2.partial_dict = split_alphabet_for_decoding(g.decoded_word, res['alphabet_to_emoji'])
-        g.treatment = Constants.treatments[g.id_in_subsession % 2]
+
     treatment = models.StringField()
     decoded_word = models.StringField()
     encoded_word = models.StringField()
@@ -164,6 +174,11 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    @property
+    def remaining_time(self):
+        time_to_go = self.participant.vars.get('time_to_go')
+        return time_to_go - datetime.now(timezone.utc).timestamp()
+
     partial_dict = models.StringField()
     time_elapsed = models.FloatField()
     start_time = djmodels.DateTimeField(null=True)
@@ -190,8 +205,8 @@ class Player(BasePlayer):
             since_last_input=data['sinceLastInput']
         )
 
-    def handle_completed(self, data):
-        logger.info('Got completion')
+    def handle_answer(self, data):
+        logger.info('Got answer')
         self.completion_time = data['completedAt']
         self.start_time = data['startTime']
         self.time_elapsed = data['timeElapsed']
@@ -205,7 +220,8 @@ class Player(BasePlayer):
 
         return {'type': 'completed',
                 'who': self.participant.code,
-                'group_completed': self.group.completed}  # this is needed to trigger the completion of the page
+                'group_completed': self.group.completed,
+                }  # this is needed to trigger the completion of the page
 
     def process_data(player, data):
         logger.info(f"Got data: {data}")
@@ -217,8 +233,9 @@ class Player(BasePlayer):
 
         elif type == 'input':
             player.handle_input(data)
-        elif type == 'completed':
-            return {0: player.handle_completed(data)}
+        elif type == 'answer':
+            data = player.handle_answer(data)
+            return {i.id_in_group: {**data, 'player_completed': i.completed} for i in player.group.get_players()}
 
 
 class Input(djmodels.Model):

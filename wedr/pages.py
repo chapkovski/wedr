@@ -14,7 +14,10 @@ class GameSettingWP(WaitPage):
     group_by_arrival_time = True
     min_to_wait = 5
     body_text = f"If you wait for more than {min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
-    after_all_players_arrive = 'set_up_game'
+    after_all_players_arrive = 'set_treatment'
+
+    def is_displayed(self):
+        return self.round_number == 1
 
     def vars_for_template(self):
         return dict(no_partner_url=self.session.config.get('no_partner_url'))
@@ -33,19 +36,25 @@ class WorkingPage(Page):
     live_method = 'process_data'
 
     def is_displayed(self):
+        if self.player.remaining_time <= 0:
+            return False
         return not self.group.completed
 
     def js_vars(self):
-        time_to_go = self.participant.vars.setdefault('time_to_go', (
-                datetime.now(timezone.utc) + timedelta(seconds=Constants.time_for_work)).timestamp())
+        # todo: move to group level?
+        default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
+        time_to_go = self.participant.vars.setdefault('time_to_go', default_time.timestamp())
         main_dict = dict(
             groupDict=json.loads(self.group.alphabet_to_emoji),
             encodedWord=json.loads(self.group.encoded_word),
+            decodedWord=self.group.decoded_word,
             partialDict=json.loads(self.player.partial_dict),
             ownCode=self.participant.code,
-            remaining_time=time_to_go - datetime.now(timezone.utc).timestamp()
+            remaining_time=self.player.remaining_time,
+            player_completed=self.player.completed,
+            group_completed=self.group.completed,
+            num_decoded_words=self.round_number - 1,
         )
-
 
         word = Constants.words[self.round_number - 1]
         res = encode_word_with_alphabet(word)
@@ -76,7 +85,10 @@ class MatchPage(Page):
 
 
 class PartnerWP(WaitPage):
-    pass
+    def is_displayed(self):
+        return self.player.remaining_time > 0
+
+    after_all_players_arrive = 'set_up_game'
 
 
 page_sequence = [
