@@ -20,13 +20,10 @@ from collections import OrderedDict
 from pprint import pprint
 logger = logging.getLogger(__name__)
 # TODO
-# ADD IN INSTRUCTIONS AND CQS INFORMATION
+# separete example with dictionary and with input
 # 1. ABOUT SUBMITTION (THEY WILL PROCEED AUTOMATICALLY AS SOON AS THEY ENTER)
-# 2. ONCE AGAIN SOME LETTERS ARE *MISSING* FROM THE USER'S SET OF LETTERS
 
 # TODO:
-
-# 2. insert page with instructions
 
 # 4. popup confirming success when the word is submitted correctly
 
@@ -63,53 +60,22 @@ def split_alphabet_for_decoding(decoded_word, alphabet_to_emoji, n=10):
     print(f'Length of second participant dict: {len(second_participant_dict)}')
     return json.dumps(first_participant_dict), json.dumps(second_participant_dict)
 
-def is_single_scalar(emoji):
-    # Normalize the emoji to its fully decomposed form
-    decomposed = emoji.encode('unicode-escape').decode('ASCII')
-    # If it contains '\u200d' (Zero Width Joiner), it's a composite emoji
-    return '\\u200d' not in decomposed
-
-def get_unicode_codepoints(emoji):
-    # Return a tuple of Unicode code points for a given emoji
-    return tuple(ord(char) for char in emoji)
-
-def select_emojis(emojis, number_to_select, min_distance):
-    selected_emojis = []
-    # Sort emojis by their combined code points values
-    sorted_emojis = sorted(emojis, key=get_unicode_codepoints)
-
-    while len(selected_emojis) < number_to_select:
-        # Randomly select an emoji from the sorted list
-        emoji = random.choice(sorted_emojis)
-        emoji_codepoints = get_unicode_codepoints(emoji)
-
-        # Check if the emoji is at a minimum distance from all previously selected emojis
-        if all(min(abs(a - b) for a in emoji_codepoints for b in get_unicode_codepoints(e)) >= min_distance for e in selected_emojis):
-            selected_emojis.append(emoji)
-            # Remove a range of emojis around the selected one to maintain the distance
-            sorted_emojis = [e for e in sorted_emojis if min(abs(a - b) for a in get_unicode_codepoints(e) for b in emoji_codepoints) >= min_distance]
-
-        # If we've removed too many and can't select enough, reduce the distance
-        if len(sorted_emojis) < number_to_select - len(selected_emojis):
-            logger.warning("Not enough emojis to maintain the minimum distance. Reducing distance.")
-            return select_emojis(emojis, number_to_select, min_distance - 1)
-
-    return selected_emojis
 def encode_word_with_alphabet(word):
     # List of example emojis categorized under 'People & Body' for demonstration
-    all_emojis = emojis.db.utils.db.EMOJI_DB
-    allowed_categories = ['People & Body', 'Animals & Nature', 'Food & Drink', 'Travel & Places', 'Activities', ]
-    allowed_emojis = [i.emoji for i in all_emojis if i.category in allowed_categories]
+    # all_emojis = emojis.db.utils.db.EMOJI_DB
+    # let's read emojis from 'data/emojis.txt
+    with open('data/emojis.txt', 'r') as f:
+        allowed_emojis = f.readlines()
+        allowed_emojis = list(set([i.strip() for i in allowed_emojis]))
 
-    allowed_emojis = [i for i in allowed_emojis if is_single_scalar(i)]
 
     # Create a mapping between alphabets and a random set of emojis
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    selected_emojis = select_emojis(allowed_emojis, len(alphabet), 10)
+    selected_emojis = random.sample(allowed_emojis, len(alphabet))
     alphabet_to_emoji = dict(zip(alphabet, selected_emojis))
 
     # Encode the word
-    encoded_word = [alphabet_to_emoji.get(letter, letter) for letter in word]
+    encoded_word = [alphabet_to_emoji.get(letter) for letter in word]
     return {'encoded_word': encoded_word, 'alphabet_to_emoji': alphabet_to_emoji}
 
 
