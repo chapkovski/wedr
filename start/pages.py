@@ -7,7 +7,7 @@ from json import JSONDecodeError
 
 class FirstWP(WaitPage):
     group_by_arrival_time = True
-    body_text = "If you wait for more than 5 minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
+    body_text = "If your partner does not show up after 5 minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time."
 
     def is_displayed(self):
         return self.round_number == 1

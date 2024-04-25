@@ -7,7 +7,7 @@ const json = {
     {
      "type": "radiogroup",
      "name": "question1",
-     "title": "Do I have all the letters I need to decode the word on my own, without any help from my partner?\"",
+     "title": "Do I have all the emoji/letter combinations I need to decode the word on my own, without any help from my partner?\"",
      "isRequired": true,
      "validators": [
       {
@@ -58,7 +58,24 @@ const json = {
       "Yes",
       "No"
      ],
-     "otherText": "Other:",
+     "showClearButton": true
+    },
+       {
+     "type": "radiogroup",
+     "name": "question4",
+     "title": "For each new task will you and your partner  receive a new set of letters and corresponding emojis to decode?",
+     "isRequired": true,
+     "validators": [
+      {
+       "type": "expression",
+       "text": "For each task you and your partner will receive a new set of letters and corresponding emojis and a new word to decode.",
+       "expression": "{question4} == 'Yes'"
+      }
+     ],
+     "choices": [
+      "Yes",
+      "No"
+     ],
      "showClearButton": true
     }
    ]
