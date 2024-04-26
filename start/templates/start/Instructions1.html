@@ -1,0 +1,19 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    The Word Decoding Task
+{% endblock %}
+
+{% block content %}
+
+    {% include 'wedr/includes/instructions1.html' %}
+
+
+
+    <div class="my-3">
+        {% next_button %}
+    </div>
+{% endblock %}
+
+

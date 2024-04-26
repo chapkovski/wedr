@@ -18,9 +18,13 @@ class Intro(Page):
         return dict(minutes=int(self.session.config.get('time_for_work', 600) / 60))
 
 
-class Instructions(Page):
+class Instructions1(Page):
     def vars_for_template(self):
         return dict(show_images=True)
+
+
+class Instructions2(Page):
+    pass
 
 
 class CQPage(Page):
@@ -47,6 +51,7 @@ page_sequence = [
     FirstWP,
     # PolPage,
     Intro,
-    Instructions,
+    Instructions1,
+    Instructions2,
     CQPage,
 ]

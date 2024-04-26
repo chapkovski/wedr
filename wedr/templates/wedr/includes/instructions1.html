@@ -1,0 +1,41 @@
+{% load static otree %}
+
+<div class="list-group-item">
+    {% if show_images|default_if_none:False %}
+        <div class="border text-center">
+            <img width="100%" src="{% static 'imgs/dict.png' %}" alt="Example of dictionary">
+        </div>
+    {% endif %}
+    <strong>Dictionary:</strong> At the top of the screen, you will see a dictionary that shows the
+    correspondence between each letter of the alphabet and a specific emoji.
+</div>
+<div class="list-group-item">
+    {% if show_images|default_if_none:False %}
+        <div class="border text-center">
+            <img width="100%" style='max-width:200px' src="{% static 'imgs/input.png' %}"
+                 alt="Example of input">
+        </div>
+    {% endif %}
+
+    <strong>Encoded Word:</strong> Below the dictionary, you will see a word that is encoded using these
+    emojis.
+    <br>
+    <strong>Input Field:</strong> You will also see an input field where you can type in the decoded
+    word.
+    <br>  {% if show_images|default_if_none:False %}
+    In the example above, the correct word is "duck".
+{% endif %}
+</div>
+<div class="list-group-item">
+
+    You can use uppercase or lowercase letters — it doesn't matter.
+
+</div>
+{% if show_images|default_if_none:False %}
+
+    <div class="list-group-item" style="">
+        Your goal is to decode as many words as possible within the time limit.
+    </div>
+
+{% endif %}
+
