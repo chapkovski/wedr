@@ -92,7 +92,7 @@ class PartnerWP(WaitPage):
 page_sequence = [
 
     GameSettingWP,
-    # MatchPage,
+    MatchPage,
     PartnerWP,
     WorkingPage,
 ]

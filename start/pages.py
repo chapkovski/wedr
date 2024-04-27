@@ -49,9 +49,10 @@ class PolPage(Page):
 
 page_sequence = [
     FirstWP,
+
+    # Intro,
+    # Instructions1,
+    # Instructions2,
+    # CQPage,
     # PolPage,
-    Intro,
-    Instructions1,
-    Instructions2,
-    CQPage,
 ]

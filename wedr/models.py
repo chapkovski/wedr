@@ -18,7 +18,10 @@ import logging
 from collections import OrderedDict
 # let's import cycle
 from pprint import pprint
+
 logger = logging.getLogger(__name__)
+
+
 # TODO
 # separete example with dictionary and with input
 # 1. ABOUT SUBMITTION (THEY WILL PROCEED AUTOMATICALLY AS SOON AS THEY ENTER)
@@ -60,6 +63,7 @@ def split_alphabet_for_decoding(decoded_word, alphabet_to_emoji, n=10):
     print(f'Length of second participant dict: {len(second_participant_dict)}')
     return json.dumps(first_participant_dict), json.dumps(second_participant_dict)
 
+
 def encode_word_with_alphabet(word):
     # List of example emojis categorized under 'People & Body' for demonstration
     # all_emojis = emojis.db.utils.db.EMOJI_DB
@@ -67,7 +71,6 @@ def encode_word_with_alphabet(word):
     with open('data/emojis.txt', 'r') as f:
         allowed_emojis = f.readlines()
         allowed_emojis = list(set([i.strip() for i in allowed_emojis]))
-
 
     # Create a mapping between alphabets and a random set of emojis
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
@@ -104,24 +107,32 @@ class Constants(BaseConstants):
         statements = list(csv.DictReader(f))
 
 
-
 class Subsession(BaseSubsession):
+
     def creating_session(self):
         pass
 
+
 class Group(BaseGroup):
+
     def set_time_over(self):
         default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
         for p in self.get_players():
-            p.participant.vars['time_to_go'] =  default_time.timestamp()
+            p.participant.vars['time_to_go'] = default_time.timestamp()
 
     def set_treatment(self):
         self.set_time_over()
+        # TODO - loop through assigning ideally_agree correctly (first two groups - True, second two groups - False)
+
+        _id = self.id_in_subsession-2
+        self.ideal_treatment = Constants.treatments[_id % 2]
+        self.ideally_agree = (_id//2) % 2
         self.treatment = Constants.treatments[self.id_in_subsession % 2]
+
     def set_up_game(self):
-        g=self
+        g = self
         # we need to encode the word and split the alphabet between the two players
-        g.decoded_word = Constants.words[self.round_number-1] #choices(Constants.words)[0]
+        g.decoded_word = Constants.words[self.round_number - 1]  # choices(Constants.words)[0]
         res = encode_word_with_alphabet(g.decoded_word)
         g.alphabet_to_emoji = json.dumps(res['alphabet_to_emoji'])
         g.encoded_word = json.dumps(res['encoded_word'])
@@ -130,6 +141,8 @@ class Group(BaseGroup):
         p1.partial_dict, p2.partial_dict = split_alphabet_for_decoding(g.decoded_word, res['alphabet_to_emoji'])
 
     treatment = models.StringField()
+    ideal_treatment = models.StringField()
+    ideally_agree = models.BooleanField()
     decoded_word = models.StringField()
     encoded_word = models.StringField()
     alphabet_to_emoji = models.StringField()
@@ -144,6 +157,7 @@ class Player(BasePlayer):
     def remaining_time(self):
         time_to_go = self.participant.vars.get('time_to_go')
         return time_to_go - datetime.now(timezone.utc).timestamp()
+
 
     partial_dict = models.StringField()
     time_elapsed = models.FloatField()
