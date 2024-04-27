@@ -101,7 +101,9 @@ class Constants(BaseConstants):
     num_rounds = 3
 
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
-    treatments = ['neutral', 'polarizing']
+    POLARIZING_TREATMENT = 'polarizing'
+    NEUTRAL_TREATMENT = 'neutral'
+    treatments = [POLARIZING_TREATMENT, NEUTRAL_TREATMENT]
 
     with open('data/polquestions.csv', 'r') as f:
         statements = list(csv.DictReader(f))
@@ -122,12 +124,39 @@ class Group(BaseGroup):
 
     def set_treatment(self):
         self.set_time_over()
-        # TODO - loop through assigning ideally_agree correctly (first two groups - True, second two groups - False)
-
-        _id = self.id_in_subsession-2
+        _id = self.id_in_subsession - 2
         self.ideal_treatment = Constants.treatments[_id % 2]
-        self.ideally_agree = (_id//2) % 2
-        self.treatment = Constants.treatments[self.id_in_subsession % 2]
+        is_ideal_treatment_polar = self.ideal_treatment == Constants.POLARIZING_TREATMENT
+        self.ideally_agree = (_id // 2) % 2
+        # here we need to check feasilibity:
+        # TODO: we need to make the 3 not hardcoded later.
+        p1 = self.get_player_by_id(1).participant
+        p2 = self.get_player_by_id(2).participant
+        p1_polar_binary = p1.vars.get('polarizing_score', 0) < 3
+        p2_polar_binary = p2.vars.get('polarizing_score', 0) < 3
+        p1_neutral_binary = p1.vars.get('neutral_score', 0) < 3
+        p2_neutral_binary = p2.vars.get('neutral_score', 0) < 3
+        agree_polar = p1_polar_binary == p2_polar_binary
+        agree_neutral = p1_neutral_binary == p2_neutral_binary
+        current_status = {Constants.POLARIZING_TREATMENT: agree_polar, Constants.NEUTRAL_TREATMENT: agree_neutral}
+        if current_status[self.ideal_treatment] == self.ideally_agree:
+            self.treatment = self.ideal_treatment
+            self.agreement = self.ideally_agree
+        else:
+            #     let's get all previous groups, calculate the number of times  of combinations of treatments and agreements and wll choose the least frequent one
+            previous_groups = self.session.get_groups()
+            n_polarized_groups = len([g for g in previous_groups if
+                                      g.treatment == Constants.POLARIZING_TREATMENT and g.agreement == agree_polar])
+            n_neutral_groups = len([g for g in previous_groups if
+                                    g.treatment == Constants.NEUTRAL_TREATMENT and g.agreement == agree_neutral])
+            if n_polarized_groups < n_neutral_groups:
+                self.treatment = Constants.POLARIZING_TREATMENT
+                self.agreement = agree_polar
+            else:
+                self.treatment = Constants.NEUTRAL_TREATMENT
+                self.agreement = agree_neutral
+
+
 
     def set_up_game(self):
         g = self
@@ -141,6 +170,7 @@ class Group(BaseGroup):
         p1.partial_dict, p2.partial_dict = split_alphabet_for_decoding(g.decoded_word, res['alphabet_to_emoji'])
 
     treatment = models.StringField()
+    agreement = models.BooleanField()
     ideal_treatment = models.StringField()
     ideally_agree = models.BooleanField()
     decoded_word = models.StringField()
@@ -157,7 +187,6 @@ class Player(BasePlayer):
     def remaining_time(self):
         time_to_go = self.participant.vars.get('time_to_go')
         return time_to_go - datetime.now(timezone.utc).timestamp()
-
 
     partial_dict = models.StringField()
     time_elapsed = models.FloatField()

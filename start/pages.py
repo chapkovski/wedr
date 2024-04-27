@@ -1,9 +1,9 @@
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
-from .models import Constants
+from .models import Constants, calculate_grouped_averages
 import json
 from json import JSONDecodeError
-
+from pprint import pprint
 
 class FirstWP(WaitPage):
     group_by_arrival_time = True
@@ -39,8 +39,15 @@ class PolPage(Page):
         raw_data = self.request.POST.get('survey_data')
         try:
             json_data = json.loads(raw_data)
-            print(json_data)
+            averages = calculate_grouped_averages(json_data)
+            self.player.polarizing_score = averages.get('polarizing', 0)
+            self.player.neutral_score = averages.get('neutral', 0)
             self.player.survey_data = json.dumps(json_data)
+            self.participant.vars['survey_data'] = json_data
+            self.participant.vars['polarizing_score'] = self.player.polarizing_score
+            self.participant.vars['neutral_score'] = self.player.neutral_score
+
+
         except JSONDecodeError:
             print('No data')
         print('*' * 100)
@@ -54,5 +61,5 @@ page_sequence = [
     # Instructions1,
     # Instructions2,
     # CQPage,
-    # PolPage,
+    PolPage,
 ]
