@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.countdown/2.2.0/jquery.countdown.min.js"></script>
     <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
@@ -54,47 +55,47 @@
     <div class="d-none animate__animated animate__zoomIn animate__slower" id="next-button">
         {% next_button %}
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.countdown/2.2.0/jquery.countdown.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            console.debug('Document ready')
-            var finalDate = new Date().getTime() + js_vars.seconds_on_page*1000; // Current time + 30 sec
+<script>
+    $(document).ready(function () {
+        console.debug('Document ready');
+    });
 
-            $('#clock').countdown(finalDate)
-                .on('update.countdown', function (event) {
+    // JavaScript to handle revealing list items one by one
+    var listItems = document.querySelectorAll('#statementList .list-group-item');
+    var currentItem = 0; // track the current item index
 
-                    const ending = event.strftime('%S') === '01' ? 'second' : 'seconds';
-                    $('#clock').text(`You can proceed in ${event.strftime('%S')} ${ending}`);
-                })
-                .on('finish.countdown', function (event) {
+    document.getElementById('revealButton').addEventListener('click', function () {
+        if (currentItem < listItems.length) {
+            listItems[currentItem].style.display = 'block'; // show the current item
+            currentItem++; // increment the index to point to the next item
+        }
+        if (currentItem === listItems.length) {
+            document.getElementById('instructions').style.display = 'none'; // hide the instruction div
+            document.getElementById('revealButton').style.display = 'none'; // hide the button
+            startCountdown(); // Start the countdown
+        }
+    });
+
+    function startCountdown() {
+        var finalDate = new Date().getTime() + js_vars.seconds_on_page * 1000; // Current time + seconds defined in js_vars
+        $('#clock').countdown(finalDate)
+            .on('update.countdown', function (event) {
+                const ending = event.strftime('%S') === '01' ? 'second' : 'seconds';
+                if (event.elapsed) {
+                    $('#clock').hide(); // Hide if elapsed
                     $('#next-button').removeClass('d-none'); // Show the next button
-                    $('#clock').hide(); // Optionally hide the countdown message
-                });
-        });
-    </script>
-    <script>
-        // JavaScript to handle revealing list items one by one
-        var listItems = document.querySelectorAll('#statementList .list-group-item');
-        var currentItem = 0; // track the current item index
-
-        document.getElementById('revealButton').addEventListener('click', function () {
-            if (currentItem < listItems.length) {
-                listItems[currentItem].style.display = 'block'; // show the current item
-                currentItem++; // increment the index to point to the next item
-            }
-            if (currentItem === listItems.length) {
-                document.getElementById('instructions').style.display = 'none'; // hide the instruction div
-                document.getElementById('revealButton').style.display = 'none'; // hide the button
-                $('#clock').removeClass('d-none'); // Show the countdown
-                // let's show next block in timeout of 2 seconds
-
-
-            }
-        });
-    </script>
-
-
+                } else {
+                    $('#clock').text(`You can proceed in ${event.strftime('%S')} ${ending}`);
+                }
+            })
+            .on('finish.countdown', function (event) {
+                $('#clock').hide(); // Optionally hide the countdown message
+                $('#next-button').removeClass('d-none'); // Show the next button
+            })
+            .removeClass('d-none'); // Ensure the countdown is visible if it was previously hidden
+    }
+</script>
 
 
 {% endblock %}

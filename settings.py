@@ -15,7 +15,12 @@ SESSION_CONFIGS = [
        num_demo_participants=8,
        app_sequence=['wedr']
     ),
-
+    dict(
+        name='start',
+        display_name="start",
+        num_demo_participants=18,
+        app_sequence=['start']
+    ),
     dict(
         name='q',
         display_name="q only",

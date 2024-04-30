@@ -101,7 +101,7 @@ class MatchPage2(Page):
 
 class PartnerWP(WaitPage):
     def is_displayed(self):
-        return self.player.remaining_time > 0
+        return self.round_number ==1 or self.player.remaining_time > 0
 
     after_all_players_arrive = 'set_up_game'
 

@@ -125,12 +125,15 @@ class Subsession(BaseSubsession):
 class Group(BaseGroup):
 
     def set_time_over(self):
+        print('*' * 100)
+        print('Setting time over')
+        print('*' * 100)
         default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
         for p in self.get_players():
             p.participant.vars['time_to_go'] = default_time.timestamp()
 
     def set_treatment(self):
-        self.set_time_over()
+
         _id = self.id_in_subsession - 2
         self.ideal_treatment = Constants.treatments[_id % 2]
         is_ideal_treatment_polar = self.ideal_treatment == Constants.POLARIZING_TREATMENT
@@ -169,6 +172,8 @@ class Group(BaseGroup):
                 self.agreement = agreement_status_neutral
 
     def set_up_game(self):
+        if self.round_number == 1:
+            self.set_time_over()
         g = self
         # we need to encode the word and split the alphabet between the two players
         g.decoded_word = Constants.words[self.round_number - 1]  # choices(Constants.words)[0]
@@ -195,12 +200,13 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     def start(self):
+        print('start!!!!!!!!!!!!!!!!')
         # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
         v = self.participant.vars
-        v['polarizing_set'] = choices([0, 1], k=3, )
-        v['neutral_set'] = choices([0, 1], k=3, )
-        v['polarizing_score'] = sum(v['polarizing_set']) / 3
-        v['neutral_score'] = sum(v['neutral_set']) / 3
+        # v['polarizing_set'] = choices([0, 1], k=3, )
+        # v['neutral_set'] = choices([0, 1], k=3, )
+        # v['polarizing_score'] = sum(v['polarizing_set']) / 3
+        # v['neutral_score'] = sum(v['neutral_set']) / 3
         self.polarizing_set = json.dumps(v['polarizing_set'])
         self.neutral_set = json.dumps(v['neutral_set'])
         self.polarizing_score = self.participant.vars['polarizing_score']
