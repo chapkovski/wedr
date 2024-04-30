@@ -30,6 +30,13 @@ logger = logging.getLogger(__name__)
 
 # 4. popup confirming success when the word is submitted correctly
 
+def has_disagreement(list1, list2):
+    return any(x != y for x, y in zip(list1, list2))
+
+
+def has_agreement(list1, list2):
+    return any(x == y for x, y in zip(list1, list2))
+
 
 def split_alphabet_for_decoding(decoded_word, alphabet_to_emoji, n=10):
     # Remove duplicates and convert the decoded word to a set for efficient lookups
@@ -99,7 +106,7 @@ class Constants(BaseConstants):
         words = [i.strip() for i in f.readlines()]
 
     num_rounds = 3
-
+    seconds_on_page= 15
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
     POLARIZING_TREATMENT = 'polarizing'
     NEUTRAL_TREATMENT = 'neutral'
@@ -129,34 +136,37 @@ class Group(BaseGroup):
         is_ideal_treatment_polar = self.ideal_treatment == Constants.POLARIZING_TREATMENT
         self.ideally_agree = (_id // 2) % 2
         # here we need to check feasilibity:
-        # TODO: we need to make the 3 not hardcoded later.
+
         p1 = self.get_player_by_id(1).participant
         p2 = self.get_player_by_id(2).participant
-        p1_polar_binary = p1.vars.get('polarizing_score', 0) < 3
-        p2_polar_binary = p2.vars.get('polarizing_score', 0) < 3
-        p1_neutral_binary = p1.vars.get('neutral_score', 0) < 3
-        p2_neutral_binary = p2.vars.get('neutral_score', 0) < 3
-        agree_polar = p1_polar_binary == p2_polar_binary
-        agree_neutral = p1_neutral_binary == p2_neutral_binary
-        current_status = {Constants.POLARIZING_TREATMENT: agree_polar, Constants.NEUTRAL_TREATMENT: agree_neutral}
+        if self.ideally_agree:
+            print('we try to find if there is at least one agreement')
+            agreement_status_pol = has_agreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
+            agreement_status_neutral = has_agreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
+
+        else:
+            print('we try to find if there is at least one disagreement')
+            agreement_status_pol = not has_disagreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
+            agreement_status_neutral = not has_disagreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
+
+        current_status = {Constants.POLARIZING_TREATMENT: agreement_status_pol, Constants.NEUTRAL_TREATMENT: agreement_status_neutral}
+        print(f'Current status: {current_status=}')
         if current_status[self.ideal_treatment] == self.ideally_agree:
             self.treatment = self.ideal_treatment
             self.agreement = self.ideally_agree
         else:
             #     let's get all previous groups, calculate the number of times  of combinations of treatments and agreements and wll choose the least frequent one
-            previous_groups = self.session.get_groups()
+            previous_groups = self.subsession.get_groups()
             n_polarized_groups = len([g for g in previous_groups if
-                                      g.treatment == Constants.POLARIZING_TREATMENT and g.agreement == agree_polar])
+                                      g.treatment == Constants.POLARIZING_TREATMENT and g.agreement == agreement_status_pol])
             n_neutral_groups = len([g for g in previous_groups if
-                                    g.treatment == Constants.NEUTRAL_TREATMENT and g.agreement == agree_neutral])
+                                    g.treatment == Constants.NEUTRAL_TREATMENT and g.agreement == agreement_status_neutral])
             if n_polarized_groups < n_neutral_groups:
                 self.treatment = Constants.POLARIZING_TREATMENT
-                self.agreement = agree_polar
+                self.agreement = agreement_status_pol
             else:
                 self.treatment = Constants.NEUTRAL_TREATMENT
-                self.agreement = agree_neutral
-
-
+                self.agreement = agreement_status_neutral
 
     def set_up_game(self):
         g = self
@@ -171,6 +181,7 @@ class Group(BaseGroup):
 
     treatment = models.StringField()
     agreement = models.BooleanField()
+
     ideal_treatment = models.StringField()
     ideally_agree = models.BooleanField()
     decoded_word = models.StringField()
@@ -183,6 +194,20 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    def start(self):
+        # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
+        v = self.participant.vars
+        v['polarizing_set'] = choices([0, 1], k=3, )
+        v['neutral_set'] = choices([0, 1], k=3, )
+        v['polarizing_score'] = sum(v['polarizing_set']) / 3
+        v['neutral_score'] = sum(v['neutral_set']) / 3
+        self.polarizing_set = json.dumps(v['polarizing_set'])
+        self.neutral_set = json.dumps(v['neutral_set'])
+        self.polarizing_score = self.participant.vars['polarizing_score']
+        self.neutral_score = self.participant.vars['neutral_score']
+
+
+
     @property
     def remaining_time(self):
         time_to_go = self.participant.vars.get('time_to_go')
@@ -193,6 +218,12 @@ class Player(BasePlayer):
     start_time = djmodels.DateTimeField(null=True)
     completion_time = djmodels.DateTimeField(null=True)
     completed = models.BooleanField(default=False)
+    neutral_score = models.FloatField()
+    polarizing_score = models.FloatField()
+    neutral_set = models.StringField()
+    polarizing_set = models.StringField()
+
+
 
     def handle_message(self, data):
         logger.info('Got message', data)

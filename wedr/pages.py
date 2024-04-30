@@ -39,8 +39,10 @@ class WorkingPage(Page):
         if self.player.remaining_time <= 0:
             return False
         return not self.group.completed
+
     def vars_for_template(self):
         return dict(show_warning=True)
+
     def js_vars(self):
         main_dict = dict(
             groupDict=json.loads(self.group.alphabet_to_emoji),
@@ -75,11 +77,26 @@ class WorkingPage(Page):
         return super().post()
 
 
-class MatchPage(Page):
+class MatchPage1(Page):
+    def is_displayed(self):
+        return self.round_number == 1
+
     def vars_for_template(self):
         treatment = self.group.treatment
         statements = [i for i in Constants.statements if i['treatment'] == treatment]
         return dict(statements=statements)
+
+
+class MatchPage2(Page):
+    def is_displayed(self):
+        return self.round_number == 1
+    def js_vars(self):
+        return dict(seconds_on_page=Constants.seconds_on_page)
+    def vars_for_template(self):
+        treatment = self.group.treatment
+        statements = [i for i in Constants.statements if i['treatment'] == treatment]
+        agreement_status = 'agree' if self.group.agreement else 'disagree'
+        return dict(statements=statements, agreement_status=agreement_status)
 
 
 class PartnerWP(WaitPage):
@@ -92,7 +109,9 @@ class PartnerWP(WaitPage):
 page_sequence = [
 
     GameSettingWP,
-    MatchPage,
+    # MatchPage1,
+    MatchPage2,
+
     PartnerWP,
     WorkingPage,
 ]
