@@ -1,3 +1,5 @@
+import random
+
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
 from .models import Constants, encode_word_with_alphabet
@@ -87,6 +89,7 @@ class MatchPage(Page):
     def vars_for_template(self):
         treatment = self.group.treatment
         statements = [i for i in Constants.statements if i['treatment'] == treatment]
+        random.shuffle(statements)
         agreement_status = 'agree' if self.group.agreement else 'disagree'
         return dict(statements=statements, agreement_status=agreement_status)
 
