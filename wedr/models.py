@@ -105,8 +105,8 @@ class Constants(BaseConstants):
     with open('data/words.csv', 'r') as f:
         words = [i.strip() for i in f.readlines()]
 
-    num_rounds = 3
-    seconds_on_page= 15
+    num_rounds = 30
+    seconds_on_page = 15  # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
     POLARIZING_TREATMENT = 'polarizing'
     NEUTRAL_TREATMENT = 'neutral'
@@ -133,7 +133,6 @@ class Group(BaseGroup):
             p.participant.vars['time_to_go'] = default_time.timestamp()
 
     def set_treatment(self):
-
         _id = self.id_in_subsession - 2
         self.ideal_treatment = Constants.treatments[_id % 2]
         is_ideal_treatment_polar = self.ideal_treatment == Constants.POLARIZING_TREATMENT
@@ -152,7 +151,8 @@ class Group(BaseGroup):
             agreement_status_pol = not has_disagreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
             agreement_status_neutral = not has_disagreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
 
-        current_status = {Constants.POLARIZING_TREATMENT: agreement_status_pol, Constants.NEUTRAL_TREATMENT: agreement_status_neutral}
+        current_status = {Constants.POLARIZING_TREATMENT: agreement_status_pol,
+                          Constants.NEUTRAL_TREATMENT: agreement_status_neutral}
         print(f'Current status: {current_status=}')
         if current_status[self.ideal_treatment] == self.ideally_agree:
             self.treatment = self.ideal_treatment
@@ -200,19 +200,18 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     def start(self):
-        print('start!!!!!!!!!!!!!!!!')
+
         # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
         v = self.participant.vars
-        # v['polarizing_set'] = choices([0, 1], k=3, )
-        # v['neutral_set'] = choices([0, 1], k=3, )
-        # v['polarizing_score'] = sum(v['polarizing_set']) / 3
-        # v['neutral_score'] = sum(v['neutral_set']) / 3
+        if 'start' not in self.session.config.get('app_sequence'):
+            v['polarizing_set'] = choices([0, 1], k=3, )
+            v['neutral_set'] = choices([0, 1], k=3, )
+            v['polarizing_score'] = sum(v['polarizing_set']) / 3
+            v['neutral_score'] = sum(v['neutral_set']) / 3
         self.polarizing_set = json.dumps(v['polarizing_set'])
         self.neutral_set = json.dumps(v['neutral_set'])
         self.polarizing_score = self.participant.vars['polarizing_score']
         self.neutral_score = self.participant.vars['neutral_score']
-
-
 
     @property
     def remaining_time(self):
@@ -228,8 +227,6 @@ class Player(BasePlayer):
     polarizing_score = models.FloatField()
     neutral_set = models.StringField()
     polarizing_set = models.StringField()
-
-
 
     def handle_message(self, data):
         logger.info('Got message', data)

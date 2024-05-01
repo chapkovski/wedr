@@ -1,0 +1,43 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    A short survey before we continue
+{% endblock %}
+
+{% block content %}
+
+    <div class="card my-3">
+
+        <div class="card-body">
+            <div class="list-group list-group-flush">
+
+                <div class="list-group-item">
+                    On the next page we will ask you to complete a short survey. You will then be paired with another
+                    participant to solve puzzles together.
+
+                </div>
+
+
+                <div class="list-group-item lead text-center">
+                    Click 'Next' to continue with the survey.
+                </div>
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    {% next_button %}
+{% endblock %}
+
+

@@ -77,17 +77,9 @@ class WorkingPage(Page):
         return super().post()
 
 
-class MatchPage1(Page):
-    def is_displayed(self):
-        return self.round_number == 1
-
-    def vars_for_template(self):
-        treatment = self.group.treatment
-        statements = [i for i in Constants.statements if i['treatment'] == treatment]
-        return dict(statements=statements)
 
 
-class MatchPage2(Page):
+class MatchPage(Page):
     def is_displayed(self):
         return self.round_number == 1
     def js_vars(self):
@@ -107,11 +99,8 @@ class PartnerWP(WaitPage):
 
 
 page_sequence = [
-
     GameSettingWP,
-    # MatchPage1,
-    MatchPage2,
-
+    MatchPage,
     PartnerWP,
     WorkingPage,
 ]

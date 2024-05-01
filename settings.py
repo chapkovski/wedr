@@ -1,4 +1,5 @@
 from os import environ
+
 EXTENSION_APPS = ["wedr"]
 SESSION_CONFIGS = [
     dict(
@@ -10,10 +11,10 @@ SESSION_CONFIGS = [
             'wedr', 'q']
     ),
     dict(
-       name='wedr',
-       display_name="wedr",
-       num_demo_participants=8,
-       app_sequence=['wedr']
+        name='wedr',
+        display_name="wedr",
+        num_demo_participants=8,
+        app_sequence=['wedr']
     ),
     dict(
         name='start',
@@ -39,7 +40,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     prolific_return_url="https://app.prolific.com/submissions/complete?cc=NO_CODE",
     for_prolific=True,
     real_world_currency_per_point=1.00, participation_fee=0.00, doc="",
-    time_for_work = 2*60
+    time_for_work=5 * 60
 )
 
 # ISO-639 code

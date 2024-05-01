@@ -30,7 +30,8 @@ class Instructions2(Page):
 
 class CQPage(Page):
     pass
-
+class IntroToPol(Page):
+    pass
 
 class PolPage(Page):
     def is_displayed(self):
@@ -73,5 +74,6 @@ page_sequence = [
     Instructions1,
     Instructions2,
     CQPage,
+    IntroToPol,
     PolPage,
 ]

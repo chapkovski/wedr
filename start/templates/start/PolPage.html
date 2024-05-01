@@ -7,14 +7,16 @@
 
 {% block content %}
    <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
-    <script src="https://unpkg.com/survey-jquery@1.9.115/survey.jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/survey-jquery/1.10.2/survey.jquery.min.js" integrity="sha512-by0UtPaZIVW4faiqEE/cF3cSNhdGCDgliGE8gluMCu+ij3RJXutFREJE9YXuUfDqqVAge+8uqP9KAd1zZjMDog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://unpkg.com/survey-jquery@1.9.115/themes/index.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/survey-jquery@1.9.115/defaultV2.min.css" />
     <input type="hidden" id="survey_data" value="" name="survey_data">
-    <div id="surveyElement" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+
+    <div id="surveyElement" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 980px; width: 100%;"></div>
+
     <script src="{% static 'wedr/pol_json.js' %}"></script>
     <script src="{% static 'wedr/cq_index.js' %}"></script>
-    {% next_button %}
+
 {% endblock %}
 
 

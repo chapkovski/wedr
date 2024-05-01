@@ -67,4 +67,7 @@ const json = {
  "questionsOnPageMode": "questionPerPage",
   "showPrevButton": false,
  "completeText": "Next",
+ "showCompletedPage": false,
+ "showProgressBar": 'auto',
+    "progressBarType": "questions",
 }
