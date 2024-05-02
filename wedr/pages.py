@@ -43,7 +43,7 @@ class WorkingPage(Page):
         return not self.group.completed
 
     def vars_for_template(self):
-        return dict(show_warning=True)
+        return dict(show_warning=True, num_puzzles=Constants.num_rounds)
 
     def js_vars(self):
         main_dict = dict(
@@ -56,6 +56,7 @@ class WorkingPage(Page):
             player_completed=self.player.completed,
             group_completed=self.group.completed,
             num_decoded_words=self.round_number - 1,
+            total_words=Constants.num_rounds,
         )
 
         word = Constants.words[self.round_number - 1]
@@ -103,7 +104,7 @@ class PartnerWP(WaitPage):
 
 page_sequence = [
     GameSettingWP,
-    MatchPage,
+    # MatchPage,
     PartnerWP,
     WorkingPage,
 ]

@@ -4,6 +4,7 @@ from .models import Constants
 import json
 from json import JSONDecodeError
 from pprint import pprint
+from wedr.models import Constants as wedr_constants
 
 
 class FirstWP(WaitPage):
@@ -16,22 +17,26 @@ class FirstWP(WaitPage):
 
 class Intro(Page):
     def vars_for_template(self):
-        return dict(minutes=int(self.session.config.get('time_for_work', 600) / 60))
+        return dict(num_puzzles=wedr_constants.num_rounds)
 
 
 class Instructions1(Page):
     def vars_for_template(self):
-        return dict(show_images=True)
+        return dict(show_images=True, num_puzzles=wedr_constants.num_rounds)
 
 
 class Instructions2(Page):
-    pass
+    def vars_for_template(self):
+        return dict(show_images=True, num_puzzles=wedr_constants.num_rounds)
 
 
 class CQPage(Page):
     pass
+
+
 class IntroToPol(Page):
     pass
+
 
 class PolPage(Page):
     def is_displayed(self):
@@ -46,10 +51,10 @@ class PolPage(Page):
             json_data = json.loads(raw_data)
             pprint(raw_data)
             threshold = 3
-            polarizing_set = [v  for k, v in json_data.items() if k in Constants.polarizing]
-            neutral_set = [v  for k, v in json_data.items() if k in Constants.neutral]
-            self.player.polarizing_score = sum(polarizing_set)/len(polarizing_set)
-            self.player.neutral_score = sum(neutral_set)/len(neutral_set)
+            polarizing_set = [v for k, v in json_data.items() if k in Constants.polarizing]
+            neutral_set = [v for k, v in json_data.items() if k in Constants.neutral]
+            self.player.polarizing_score = sum(polarizing_set) / len(polarizing_set)
+            self.player.neutral_score = sum(neutral_set) / len(neutral_set)
             self.player.polarizing_set = json.dumps([v >= threshold for v in polarizing_set])
             self.player.neutral_set = json.dumps([v >= threshold for v in neutral_set])
 

@@ -9,6 +9,7 @@ from otree.api import (
     currency_range,
 )
 
+
 import pandas as pd
 
 author = 'Your name here'

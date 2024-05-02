@@ -105,7 +105,7 @@ class Constants(BaseConstants):
     with open('data/words.csv', 'r') as f:
         words = [i.strip() for i in f.readlines()]
 
-    num_rounds = 30
+    num_rounds = 10
     seconds_on_page = 15  # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
     POLARIZING_TREATMENT = 'polarizing'
