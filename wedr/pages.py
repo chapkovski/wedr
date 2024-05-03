@@ -38,8 +38,6 @@ class WorkingPage(Page):
     live_method = 'process_data'
 
     def is_displayed(self):
-        if self.player.remaining_time <= 0:
-            return False
         return not self.group.completed
 
     def vars_for_template(self):
@@ -52,7 +50,7 @@ class WorkingPage(Page):
             decodedWord=self.group.decoded_word,
             partialDict=json.loads(self.player.partial_dict),
             ownCode=self.participant.code,
-            remaining_time=self.player.remaining_time,
+
             player_completed=self.player.completed,
             group_completed=self.group.completed,
             num_decoded_words=self.round_number - 1,
@@ -96,15 +94,14 @@ class MatchPage(Page):
 
 
 class PartnerWP(WaitPage):
-    def is_displayed(self):
-        return self.round_number ==1 or self.player.remaining_time > 0
+
 
     after_all_players_arrive = 'set_up_game'
 
 
 page_sequence = [
     GameSettingWP,
-    # MatchPage,
-    PartnerWP,
-    WorkingPage,
+    MatchPage,
+    # PartnerWP,
+    # WorkingPage,
 ]

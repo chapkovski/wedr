@@ -10,6 +10,7 @@ from otree.api import (
 )
 from datetime import timedelta, datetime, timezone
 from django.db import models as djmodels
+from django.db.models import Count
 from random import choices, sample
 import random
 import emojis
@@ -111,7 +112,13 @@ class Constants(BaseConstants):
     POLARIZING_TREATMENT = 'polarizing'
     NEUTRAL_TREATMENT = 'neutral'
     treatments = [POLARIZING_TREATMENT, NEUTRAL_TREATMENT]
-
+    treatment_options = {
+        'polar_disagree_info': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
+        'polar_disagree_noinfo': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': False},
+        'polar_agree_info': {'treatment': POLARIZING_TREATMENT, 'agree': True, 'info': True},
+        'neutral_disagree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': False, 'info': True},
+        'neutral_agree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': True, 'info': True}
+    }
     with open('data/polquestions.csv', 'r') as f:
         statements = list(csv.DictReader(f))
 
@@ -123,57 +130,104 @@ class Subsession(BaseSubsession):
 
 
 class Group(BaseGroup):
+    treatment_key = models.StringField()
+    treatment = models.StringField()
+    agreement = models.BooleanField()
+    show_disagreement = models.BooleanField()
+    show_details = models.BooleanField()
 
-    def set_time_over(self):
-        print('*' * 100)
-        print('Setting time over')
-        print('*' * 100)
-        default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
-        for p in self.get_players():
-            p.participant.vars['time_to_go'] = default_time.timestamp()
+    def check_agreement_availability(self, p1, p2):
+        """
+        Check the availability of agreement and disagreement for polarizing and neutral sets.
 
-    def set_treatment(self):
-        _id = self.id_in_subsession - 2
-        self.ideal_treatment = Constants.treatments[_id % 2]
-        is_ideal_treatment_polar = self.ideal_treatment == Constants.POLARIZING_TREATMENT
-        self.ideally_agree = (_id // 2) % 2
-        # here we need to check feasilibity:
+        Args:
+        p1, p2: Participant objects, each containing 'polarizing_set' and 'neutral_set'.
 
+        Returns:
+        Dictionary with the availability of agreement and disagreement for polarizing and neutral question sets.
+        """
+        # Polarizing set agreement and disagreement
+        polar_agree = has_agreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
+        polar_disagree = has_disagreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
+
+        # Neutral set agreement and disagreement
+        neutral_agree = has_agreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
+        neutral_disagree = has_disagreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
+
+        # Compile the availability into a dictionary
+        availability_dict = {
+            'polarizing': {'agree': polar_agree, 'disagree': polar_disagree},
+            'neutral': {'agree': neutral_agree, 'disagree': neutral_disagree}
+        }
+
+        return availability_dict
+
+    def filter_feasible_treatments(self):
+        # Get participant objects
         p1 = self.get_player_by_id(1).participant
         p2 = self.get_player_by_id(2).participant
-        if self.ideally_agree:
-            print('we try to find if there is at least one agreement')
-            agreement_status_pol = has_agreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
-            agreement_status_neutral = has_agreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
 
-        else:
-            print('we try to find if there is at least one disagreement')
-            agreement_status_pol = not has_disagreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
-            agreement_status_neutral = not has_disagreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
+        # Check agreement availability
+        availability = self.check_agreement_availability(p1, p2)
+        print(f'{availability=}')
 
-        current_status = {Constants.POLARIZING_TREATMENT: agreement_status_pol,
-                          Constants.NEUTRAL_TREATMENT: agreement_status_neutral}
-        print(f'Current status: {current_status=}')
-        if current_status[self.ideal_treatment] == self.ideally_agree:
-            self.treatment = self.ideal_treatment
-            self.agreement = self.ideally_agree
+        # Define possible treatments and their feasibility requirements
+        treatment_requirements = Constants.treatment_options
+
+        treatment_counts_dict = {key: 0 for key in treatment_requirements.keys()}
+        treatment_counts_query = (self.subsession.group_set
+                                  .values('treatment_key')
+                                  .annotate(count=Count('id')))
+        treatment_counts_dict.update({item['treatment_key']: item['count'] for item in treatment_counts_query})
+
+        # Prepare a dictionary to store feasible treatments
+        feasible_treatment_counts = {}
+
+        # Evaluate each treatment option for feasibility
+        for treatment_key, requirements in treatment_requirements.items():
+            treatment_type = requirements['treatment']
+            required_agreement = requirements['agree']
+
+            # Adjust feasibility check based on whether agreement or disagreement is required
+            is_feasible = (
+                availability[treatment_type]['agree'] if required_agreement else availability[treatment_type][
+                    'disagree'])
+
+            if is_feasible:
+                feasible_treatment_counts[treatment_key] = treatment_counts_dict[treatment_key]
+
+        return feasible_treatment_counts
+
+    def choose_treatment(self):
+        feasible_treatment_counts = self.filter_feasible_treatments()
+
+        # Find the minimum count among the feasible treatments
+        min_count = min(feasible_treatment_counts.values())
+
+        # Collect all treatment keys that have the minimum count
+        least_popular_treatments = [key for key, count in feasible_treatment_counts.items() if count == min_count]
+
+        # Randomly choose one from the least popular treatments
+        if least_popular_treatments:
+            chosen_treatment_key = random.choice(least_popular_treatments)
+            print(f"Chosen treatment: {chosen_treatment_key}")
+            return chosen_treatment_key
         else:
-            #     let's get all previous groups, calculate the number of times  of combinations of treatments and agreements and wll choose the least frequent one
-            previous_groups = self.subsession.get_groups()
-            n_polarized_groups = len([g for g in previous_groups if
-                                      g.treatment == Constants.POLARIZING_TREATMENT and g.agreement == agreement_status_pol])
-            n_neutral_groups = len([g for g in previous_groups if
-                                    g.treatment == Constants.NEUTRAL_TREATMENT and g.agreement == agreement_status_neutral])
-            if n_polarized_groups < n_neutral_groups:
-                self.treatment = Constants.POLARIZING_TREATMENT
-                self.agreement = agreement_status_pol
-            else:
-                self.treatment = Constants.NEUTRAL_TREATMENT
-                self.agreement = agreement_status_neutral
+            print("No feasible treatment found")
+            return None
+
+    def set_treatment(self):
+        treatment_key = self.choose_treatment()
+        if treatment_key:
+            self.treatment_key = treatment_key
+        else:
+            raise Exception("No feasible treatment found")
+        self.treatment = Constants.treatment_options[treatment_key]['treatment']
+        self.agreement = Constants.treatment_options[treatment_key]['agree']
+        self.show_disagreement = not Constants.treatment_options[treatment_key]['info']
+        self.show_details = self.id_in_subsession % 2 == 0
 
     def set_up_game(self):
-        if self.round_number == 1:
-            self.set_time_over()
         g = self
         # we need to encode the word and split the alphabet between the two players
         g.decoded_word = Constants.words[self.round_number - 1]  # choices(Constants.words)[0]
@@ -184,11 +238,6 @@ class Group(BaseGroup):
         p2 = g.get_player_by_id(2)
         p1.partial_dict, p2.partial_dict = split_alphabet_for_decoding(g.decoded_word, res['alphabet_to_emoji'])
 
-    treatment = models.StringField()
-    agreement = models.BooleanField()
-
-    ideal_treatment = models.StringField()
-    ideally_agree = models.BooleanField()
     decoded_word = models.StringField()
     encoded_word = models.StringField()
     alphabet_to_emoji = models.StringField()
@@ -204,19 +253,21 @@ class Player(BasePlayer):
         # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
         v = self.participant.vars
         if 'start' not in self.session.config.get('app_sequence'):
-            v['polarizing_set'] = choices([0, 1], k=3, )
-            v['neutral_set'] = choices([0, 1], k=3, )
-            v['polarizing_score'] = sum(v['polarizing_set']) / 3
-            v['neutral_score'] = sum(v['neutral_set']) / 3
+            v['full_polarizing_set'] = [random.randint(0, 5) for _ in range(3)]
+            v['full_neutral_set'] = [random.randint(0,5) for _ in range(3)]
+
+
+            v['polarizing_set'] = [i>=3 for i in v['full_polarizing_set']]
+            v['neutral_set'] = [i>=3 for i in v['full_neutral_set']]
+
+            v['polarizing_score'] = sum(v['full_polarizing_set']) / 3
+            v['neutral_score'] = sum(v['full_neutral_set']) / 3
+        self.full_polarizing_set = json.dumps(v['full_polarizing_set'])
+        self.full_neutral_set = json.dumps(v['full_neutral_set'])
         self.polarizing_set = json.dumps(v['polarizing_set'])
         self.neutral_set = json.dumps(v['neutral_set'])
         self.polarizing_score = self.participant.vars['polarizing_score']
         self.neutral_score = self.participant.vars['neutral_score']
-
-    @property
-    def remaining_time(self):
-        time_to_go = self.participant.vars.get('time_to_go')
-        return time_to_go - datetime.now(timezone.utc).timestamp()
 
     partial_dict = models.StringField()
     time_elapsed = models.FloatField()
@@ -227,7 +278,8 @@ class Player(BasePlayer):
     polarizing_score = models.FloatField()
     neutral_set = models.StringField()
     polarizing_set = models.StringField()
-
+    full_neutral_set = models.StringField()
+    full_polarizing_set = models.StringField()
     def handle_message(self, data):
         logger.info('Got message', data)
         Message.objects.create(
