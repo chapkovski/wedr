@@ -224,8 +224,20 @@ class Group(BaseGroup):
             raise Exception("No feasible treatment found")
         self.treatment = Constants.treatment_options[treatment_key]['treatment']
         self.agreement = Constants.treatment_options[treatment_key]['agree']
-        self.show_disagreement = not Constants.treatment_options[treatment_key]['info']
-        self.show_details = self.id_in_subsession % 2 == 0
+        self.show_disagreement = Constants.treatment_options[treatment_key]['info']
+        if self.treatment_key == 'polar_disagree_noinfo':
+            self.show_details = False
+        else:
+            treatment_key = self.treatment_key
+            # let's count number of groups with show_details = True and show_details = False separately
+            num_show_details = self.subsession.group_set.filter(show_details=True, treatment_key=treatment_key).count()
+            num_no_show_details = self.subsession.group_set.filter(show_details=False, treatment_key=treatment_key).count()
+            if num_show_details > num_no_show_details:
+                self.show_details = False
+            elif num_show_details < num_no_show_details:
+                self.show_details = True
+            else:
+                self.show_details = random.choice([True, False])
 
     def set_up_game(self):
         g = self
@@ -250,6 +262,7 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     def get_partner(self):
         return self.get_others_in_group()[0]
+
     def start(self):
 
         # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
@@ -257,11 +270,11 @@ class Player(BasePlayer):
         if 'start' not in self.session.config.get('app_sequence'):
             data = start_constants.polq_data.copy()
             response_mapping = start_constants.response_mapping.copy()
-            full_polarizing_set=[]
-            full_neutral_set=[]
+            full_polarizing_set = []
+            full_neutral_set = []
 
             for item in data:
-                response_value = random.randint(0,5)
+                response_value = random.randint(0, 5)
                 response_text = response_mapping.get(response_value)
                 if item['treatment'] == 'polarizing':
                     full_polarizing_set.append(response_value)
@@ -275,9 +288,8 @@ class Player(BasePlayer):
             v['full_polarizing_set'] = full_polarizing_set
             v['full_neutral_set'] = full_neutral_set
 
-
-            v['polarizing_set'] = [i>=3 for i in v['full_polarizing_set']]
-            v['neutral_set'] = [i>=3 for i in v['full_neutral_set']]
+            v['polarizing_set'] = [i >= 3 for i in v['full_polarizing_set']]
+            v['neutral_set'] = [i >= 3 for i in v['full_neutral_set']]
 
             v['polarizing_score'] = sum(v['full_polarizing_set']) / 3
             v['neutral_score'] = sum(v['full_neutral_set']) / 3
@@ -297,6 +309,7 @@ class Player(BasePlayer):
     polarizing_set = models.StringField()
     full_neutral_set = models.StringField()
     full_polarizing_set = models.StringField()
+
     def handle_message(self, data):
         logger.info('Got message', data)
         Message.objects.create(

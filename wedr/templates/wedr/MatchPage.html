@@ -2,7 +2,10 @@
 {% load otree static %}
 
 {% block title %}
-    Information about your partner
+    {% if  group.show_disagreement %}  Information about your partner
+    {% else %}
+        Summary of your answers
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -31,43 +34,63 @@
         }
     </style>
 
-
-    {% if group.agreement %}
-        <div class="alert alert-success text-center lead">
-            <div class="text-h1 display-1">😊</div>
-            Your partner <b class="green">AGREES</b> with you on on at least one of the following statements:
-        </div>
-    {% else %}
-        <div class="alert alert-danger text-center lead">
-            <div class="text-h1 display-1">😞</div>
-            Your partner <b class="red">DISAGREES</b> with you on at least one of the following statements:
-        </div>
+    {% if  group.show_disagreement %}
+        {% if group.agreement %}
+            <div class="alert alert-success text-center lead">
+                <div class="text-h1 display-1">😊</div>
+                Your partner <b class="green">AGREES</b> with you on on at least one of the following statements:
+            </div>
+        {% else %}
+            <div class="alert alert-danger text-center lead">
+                <div class="text-h1 display-1">😞</div>
+                Your partner <b class="red">DISAGREES</b> with you on at least one of the following statements:
+            </div>
+        {% endif %}
     {% endif %}
-
     <table class="table table-stripped table-hover" id="statementList">
         <thead>
         <tr>
             <th>Statement</th>
-            <th>Your response</th>
-            <th>Partner's response</th>
+
+            {% if not group.show_disagreement %}
+                <th>Your response</th>
+
+            {% endif %}
+            {% if group.show_details %}
+                <th>Your response</th>
+                <th>Partner's response</th>
+            {% endif %}
         </tr>
         </thead>
         {% for i in statements %}
             <tr class=" myrow animate__animated  animate__zoomIn">
                 <td> {{ i.0.text }}</td>
-                <td class="{{ i.0.color }}">
-                    {{ i.0.response_text }}
-                </td>
-                <td class="{{ i.1.color }}">
-                    {{ i.1.response_text }}
-                </td>
+                {% if not group.show_disagreement %}
+                    <td class="{{ i.0.color }}">
+                        {{ i.0.response_text }}
+                    </td>
+
+                {% endif %}
+                {% if group.show_details %}
+                    <td class="{{ i.0.color }}">
+                        {{ i.0.response_text }}
+                    </td>
+                    <td class="{{ i.1.color }}">
+                        {{ i.1.response_text }}
+                    </td>
+                {% endif %}
                 <!-- Initially hide the items -->
 
             </tr>
         {% endfor %}
     </table>
-
-
+    {% if  group.show_disagreement %}
+        <div class="text-secondary font-italic">
+            Here, 'agree' means that you and your partner share similar views on certain statements. 'Disagree'
+            indicates
+            that your partner holds an opposite opinion from yours on the specified topics.
+        </div>
+    {% endif %}
     <div id="clock" class="alert alert-info d-none">You can proceed in <span id="time">30</span> seconds</div>
 
     <div class="d-none animate__animated animate__zoomIn animate__slower" id="next-button">

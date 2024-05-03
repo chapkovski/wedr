@@ -94,8 +94,13 @@ class MatchPage(Page):
             i['color'] = 'lightred' if i['user_response'] < 3 else 'lightgreen'
         for i in partner_answers:
             i['color'] = 'lightred' if i['user_response'] < 3 else 'lightgreen'
+
+
         my_relevant_answers  = [i for i in my_answers if i['treatment'] == treatment]
         partner_relevant_answers = [i for i in partner_answers if i['treatment'] == treatment]
+        if not self.group.show_disagreement:
+            my_relevant_answers = my_answers
+            partner_relevant_answers = partner_answers
         full_data = list(zip(my_relevant_answers, partner_relevant_answers))
 
         random.shuffle(full_data)
