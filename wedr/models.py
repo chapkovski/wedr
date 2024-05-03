@@ -13,7 +13,7 @@ from django.db import models as djmodels
 from django.db.models import Count
 from random import choices, sample
 import random
-import emojis
+from start.models import Constants as start_constants
 import json
 import logging
 from collections import OrderedDict
@@ -248,13 +248,32 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    def get_partner(self):
+        return self.get_others_in_group()[0]
     def start(self):
 
         # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
         v = self.participant.vars
         if 'start' not in self.session.config.get('app_sequence'):
-            v['full_polarizing_set'] = [random.randint(0, 5) for _ in range(3)]
-            v['full_neutral_set'] = [random.randint(0,5) for _ in range(3)]
+            data = start_constants.polq_data.copy()
+            response_mapping = start_constants.response_mapping.copy()
+            full_polarizing_set=[]
+            full_neutral_set=[]
+
+            for item in data:
+                response_value = random.randint(0,5)
+                response_text = response_mapping.get(response_value)
+                if item['treatment'] == 'polarizing':
+                    full_polarizing_set.append(response_value)
+                else:
+                    full_neutral_set.append(response_value)
+
+                item['user_response'] = response_value
+                item['response_text'] = response_text
+            self.survey_data = json.dumps(data)
+            v['survey_data'] = data
+            v['full_polarizing_set'] = full_polarizing_set
+            v['full_neutral_set'] = full_neutral_set
 
 
             v['polarizing_set'] = [i>=3 for i in v['full_polarizing_set']]
@@ -266,16 +285,14 @@ class Player(BasePlayer):
         self.full_neutral_set = json.dumps(v['full_neutral_set'])
         self.polarizing_set = json.dumps(v['polarizing_set'])
         self.neutral_set = json.dumps(v['neutral_set'])
-        self.polarizing_score = self.participant.vars['polarizing_score']
-        self.neutral_score = self.participant.vars['neutral_score']
 
+    survey_data = models.LongStringField()
     partial_dict = models.StringField()
     time_elapsed = models.FloatField()
     start_time = djmodels.DateTimeField(null=True)
     completion_time = djmodels.DateTimeField(null=True)
     completed = models.BooleanField(default=False)
-    neutral_score = models.FloatField()
-    polarizing_score = models.FloatField()
+
     neutral_set = models.StringField()
     polarizing_set = models.StringField()
     full_neutral_set = models.StringField()

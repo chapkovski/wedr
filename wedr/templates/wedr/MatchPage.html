@@ -21,34 +21,52 @@
             color: green;
             font-weight: bold;
         }
+
+        .lightgreen {
+            background: rgba(144, 238, 144, 0.5); /* lightgreen with 50% opacity */
+        }
+
+        .lightred {
+            background: rgba(240, 128, 128, 0.5); /* lightcoral with 50% opacity */
+        }
     </style>
 
 
     {% if group.agreement %}
         <div class="alert alert-success text-center lead">
             <div class="text-h1 display-1">😊</div>
-            Your  partner <b class="green">AGREES</b> with you on on at least one of the following statements:
+            Your partner <b class="green">AGREES</b> with you on on at least one of the following statements:
         </div>
     {% else %}
         <div class="alert alert-danger text-center lead">
             <div class="text-h1 display-1">😞</div>
-            Your  partner <b class="red">DISAGREES</b> with you on at least one of the following statements:
+            Your partner <b class="red">DISAGREES</b> with you on at least one of the following statements:
         </div>
     {% endif %}
 
-
-    <ul class="list-group my-3 list-group-flush" id="statementList">
+    <table class="table table-stripped table-hover" id="statementList">
+        <thead>
+        <tr>
+            <th>Statement</th>
+            <th>Your response</th>
+            <th>Partner's response</th>
+        </tr>
+        </thead>
         {% for i in statements %}
-            <li class="list-group-item animate__animated  animate__zoomIn" style="display:none;">
+            <tr class=" myrow animate__animated  animate__zoomIn">
+                <td> {{ i.0.text }}</td>
+                <td class="{{ i.0.color }}">
+                    {{ i.0.response_text }}
+                </td>
+                <td class="{{ i.1.color }}">
+                    {{ i.1.response_text }}
+                </td>
                 <!-- Initially hide the items -->
-                {{ i.text }}
-            </li>
+
+            </tr>
         {% endfor %}
-    </ul>
-    <div id="instructions" class="my-3">
-        Click 'Next' to see statements you {{ agreement_status }} with your partner.
-    </div>
-    <button id="revealButton" class="btn btn-primary" type="button">Next</button>
+    </table>
+
 
     <div id="clock" class="alert alert-info d-none">You can proceed in <span id="time">30</span> seconds</div>
 
@@ -56,46 +74,36 @@
         {% next_button %}
     </div>
 
-<script>
-    $(document).ready(function () {
-        console.debug('Document ready');
-    });
+    <script>
+        $(document).ready(function () {
+            console.debug('Document ready');
+        });
 
-    // JavaScript to handle revealing list items one by one
-    var listItems = document.querySelectorAll('#statementList .list-group-item');
-    var currentItem = 0; // track the current item index
+        // JavaScript to handle revealing list items one by one
+        var listItems = document.querySelectorAll('#statementList .myrow');
+        var currentItem = 0; // track the current item index
 
-    document.getElementById('revealButton').addEventListener('click', function () {
-        if (currentItem < listItems.length) {
-            listItems[currentItem].style.display = 'block'; // show the current item
-            currentItem++; // increment the index to point to the next item
-        }
-        if (currentItem === listItems.length) {
-            document.getElementById('instructions').style.display = 'none'; // hide the instruction div
-            document.getElementById('revealButton').style.display = 'none'; // hide the button
-            startCountdown(); // Start the countdown
-        }
-    });
+        startCountdown(); // Start the countdown
 
-    function startCountdown() {
-        var finalDate = new Date().getTime() + js_vars.seconds_on_page * 1000; // Current time + seconds defined in js_vars
-        $('#clock').countdown(finalDate)
-            .on('update.countdown', function (event) {
-                const ending = event.strftime('%S') === '01' ? 'second' : 'seconds';
-                if (event.elapsed) {
-                    $('#clock').hide(); // Hide if elapsed
+        function startCountdown() {
+            var finalDate = new Date().getTime() + js_vars.seconds_on_page * 1000; // Current time + seconds defined in js_vars
+            $('#clock').countdown(finalDate)
+                .on('update.countdown', function (event) {
+                    const ending = event.strftime('%S') === '01' ? 'second' : 'seconds';
+                    if (event.elapsed) {
+                        $('#clock').hide(); // Hide if elapsed
+                        $('#next-button').removeClass('d-none'); // Show the next button
+                    } else {
+                        $('#clock').text(`You can proceed in ${event.strftime('%S')} ${ending}`);
+                    }
+                })
+                .on('finish.countdown', function (event) {
+                    $('#clock').hide(); // Optionally hide the countdown message
                     $('#next-button').removeClass('d-none'); // Show the next button
-                } else {
-                    $('#clock').text(`You can proceed in ${event.strftime('%S')} ${ending}`);
-                }
-            })
-            .on('finish.countdown', function (event) {
-                $('#clock').hide(); // Optionally hide the countdown message
-                $('#next-button').removeClass('d-none'); // Show the next button
-            })
-            .removeClass('d-none'); // Ensure the countdown is visible if it was previously hidden
-    }
-</script>
+                })
+                .removeClass('d-none'); // Ensure the countdown is visible if it was previously hidden
+        }
+    </script>
 
 
 {% endblock %}

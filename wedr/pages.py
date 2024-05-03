@@ -87,10 +87,20 @@ class MatchPage(Page):
         return dict(seconds_on_page=Constants.seconds_on_page)
     def vars_for_template(self):
         treatment = self.group.treatment
-        statements = [i for i in Constants.statements if i['treatment'] == treatment]
-        random.shuffle(statements)
+        my_answers = json.loads(self.player.survey_data)
+        partner_answers = json.loads(self.player.get_partner().survey_data)
+        # let's update the data to include color: if the user_response value is <3 color 'lightred' and 'lightgreen' otherwise
+        for i in my_answers:
+            i['color'] = 'lightred' if i['user_response'] < 3 else 'lightgreen'
+        for i in partner_answers:
+            i['color'] = 'lightred' if i['user_response'] < 3 else 'lightgreen'
+        my_relevant_answers  = [i for i in my_answers if i['treatment'] == treatment]
+        partner_relevant_answers = [i for i in partner_answers if i['treatment'] == treatment]
+        full_data = list(zip(my_relevant_answers, partner_relevant_answers))
+
+        random.shuffle(full_data)
         agreement_status = 'agree' if self.group.agreement else 'disagree'
-        return dict(statements=statements, agreement_status=agreement_status)
+        return dict(statements=full_data, agreement_status=agreement_status)
 
 
 class PartnerWP(WaitPage):

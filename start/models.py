@@ -8,11 +8,11 @@ from otree.api import (
     Currency as c,
     currency_range,
 )
-
+from pprint import pprint
 
 import pandas as pd
 
-author = 'Your name here'
+author = 'Philip Chapkovski, Uni Duisburg-Essen'
 
 doc = """
 Your app description
@@ -25,9 +25,18 @@ class Constants(BaseConstants):
     num_rounds = 1
     # let's use pandas to read csv in data/polqustions.csv and create two lists: polarizing and neutral based on treatment key
     df = pd.read_csv('data/polquestions.csv')
+    # let's convert the dataframe to a dictionary
+    polq_data = df.to_dict( 'records')
     polarizing = df[df['treatment'] == 'polarizing']['name'].tolist()
     neutral = df[df['treatment'] == 'neutral']['name'].tolist()
-
+    response_mapping = {
+        0: "Strongly Disagree",
+        1: "Moderately Disagree",
+        2: "Slightly Disagree",
+        3: "Slightly Agree",
+        4: "Moderately Agree",
+        5: "Strongly Agree"
+    }
 
 
 class Subsession(BaseSubsession):
@@ -41,8 +50,8 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    neutral_score = models.FloatField()
-    polarizing_score = models.FloatField()
+    full_neutral_set = models.StringField()
+    full_polarizing_set = models.StringField()
     neutral_set = models.StringField()
     polarizing_set = models.StringField()
     survey_data = models.LongStringField()
