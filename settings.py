@@ -5,7 +5,7 @@ SESSION_CONFIGS = [
     dict(
         name='full',
         display_name="full",
-        num_demo_participants=2,
+        num_demo_participants=8,
         app_sequence=[
             'start',
             'wedr', 'q']
@@ -60,4 +60,9 @@ DEMO_PAGE_INTRO_HTML = """ """
 SECRET_KEY = 'i@tj^rm09+(glgb3bu!*x0yugfe1p6n-r3b)2y-$)2d%rixtxs'
 
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
-INSTALLED_APPS = ['otree']
+INSTALLED_APPS = ['otree', 'django_user_agents', ]
+
+MIDDLEWARE_CLASSES = (
+    'django_user_agents.middleware.UserAgentMiddleware',
+)
+USER_AGENTS_CACHE = 'default'

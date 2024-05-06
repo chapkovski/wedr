@@ -50,12 +50,24 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    consent_accept= models.BooleanField(
+        label="""
+         I agree to participate in the current  study. I understand that I can withdraw my consent to participate at any time and by giving
+                    consent I am not giving up any of my legal rights.""",
+        widget=widgets.CheckboxInput
+    )
     full_neutral_set = models.StringField()
     full_polarizing_set = models.StringField()
     neutral_set = models.StringField()
     polarizing_set = models.StringField()
     survey_data = models.LongStringField()
-
+    # user agent block
+    full_user_data = models.LongStringField()
+    useragent_is_mobile = models.BooleanField()
+    useragent_is_bot = models.BooleanField()
+    useragent_browser_family = models.StringField()
+    useragent_os_family = models.StringField()
+    useragent_device_family = models.StringField()
 
 
 

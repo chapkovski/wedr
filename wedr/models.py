@@ -267,6 +267,7 @@ class Player(BasePlayer):
 
         # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
         v = self.participant.vars
+        self.survey_data = json.dumps(v.get('survey_data', []))
         if 'start' not in self.session.config.get('app_sequence'):
             data = start_constants.polq_data.copy()
             response_mapping = start_constants.response_mapping.copy()
@@ -293,6 +294,7 @@ class Player(BasePlayer):
 
             v['polarizing_score'] = sum(v['full_polarizing_set']) / 3
             v['neutral_score'] = sum(v['full_neutral_set']) / 3
+
         self.full_polarizing_set = json.dumps(v['full_polarizing_set'])
         self.full_neutral_set = json.dumps(v['full_neutral_set'])
         self.polarizing_set = json.dumps(v['polarizing_set'])

@@ -5,7 +5,9 @@ import json
 from json import JSONDecodeError
 from pprint import pprint
 from wedr.models import Constants as wedr_constants
-
+import logging
+logger = logging.getLogger(__name__)
+from django_user_agents.utils import get_user_agent
 
 class FirstWP(WaitPage):
     group_by_arrival_time = True
@@ -13,7 +15,22 @@ class FirstWP(WaitPage):
 
     def is_displayed(self):
         return self.round_number == 1
+class Consent(Page):
+    def get(self, *args, **kwargs):
+        user_agent = get_user_agent(self.request)
+        logger.info(f'User agent: {user_agent}')
+        self.player.full_user_data = json.dumps(user_agent.__dict__)
+        self.player.useragent_is_mobile = user_agent.is_mobile
+        self.player.useragent_is_bot = user_agent.is_bot
+        self.player.useragent_browser_family = user_agent.browser.family
+        self.player.useragent_os_family = user_agent.os.family
+        self.player.useragent_device_family = user_agent.device.family
+        return super().get()
 
+    def vars_for_template(self):
+        return dict(num_words=wedr_constants.num_rounds)
+    form_model = 'player'
+    form_fields = ['consent_accept']
 
 class Intro(Page):
     def vars_for_template(self):
@@ -86,7 +103,7 @@ class PolPage(Page):
 
 
 page_sequence = [
-    FirstWP,
+    Consent,
     # Intro,
     # Instructions1,
     # Instructions2,

@@ -1,0 +1,111 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Consent form
+{% endblock %}
+
+{% block content %}
+    <div class="card my-3 shadow-lg p-3 mb-3 bg-white rounded">
+
+
+        <div class="card-body">
+
+            <div class="card-text">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        Thank you for choosing to support our research by participating in our study! On this page we
+                        would like to inform you about the study.
+
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        What this study is about:
+
+                    </li>
+                    <li class="list-group-item">
+                        In this study, we examine how people work together. To achieve this goal, you will need to work
+                        with another member of Prolific. Your task is to decode {{ num_words }} English words.
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        What you can expect:
+                    </li>
+                    <li class="list-group-item">
+                        On the next few pages we will explain in detail what you should do and ask you some questions to
+                        check that you have fully understood them. Then we will ask you to provide some general
+                        information about yourself. This is followed by the study, which consists of {{ num_words }}
+                        Tasks where you and your partner have to decode a simple English word that is decoded with
+                        emojis. After all {{ num_words }} tasks have been successfully decoded, a short survey follows
+                        and you
+                        are redirected back to Prolific.
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        Participation conditions:
+                    </li>
+                    <li class="list-group-item">
+                        Your participation in this study is entirely voluntary. There are no known risks or burdens
+                        associated with participation. You will receive compensation for participating in the study,
+                        announced on Prolific platform, once you have completed the study. You can withdraw from the
+                        study
+                        at any time without having to pay a penalty. However, if you withdraw before the end of the
+                        study,
+                        the compensation will be forfeited in accordance with Prolific’s rules.
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        Data privacy:
+                    </li>
+                    <li class="list-group-item">
+                        Please be assured that all data collected as part of this study will be treated confidentially.
+                        You
+                        will be asked to provide some basic demographic information about yourself, but none of this
+                        information will be used in any way to identify you personally, and no personal information will
+                        appear in any published study.
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        Data storage:
+                    </li>
+                    <li class="list-group-item">
+                        Your data will be stored securely and we will ensure that unauthorised persons do not have
+                        access to
+                        it. Your decision to participate in this study will be kept completely confidential and only the
+                        researchers will have access to the individual data. We will not collect any data that can
+                        identify
+                        you personally. All demographic data will be stored electronically on a web-based server until
+                        it is
+                        downloaded for analysis. This server is only accessible to the research team with a secure
+                        password.
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        Approval by the ethics committee:
+                    </li>
+                    <li class="list-group-item">
+                        This study has been reviewed by the German Association for Experimental Economic Research
+                        (https://gfew.de/). If you are interested, you can receive an approval confirmation for this
+                        research study by emailing the primary researcher Dr. Philipp Chapkovski at
+                        filipp.chapkovskii@uni-due.de
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        Contact
+                    </li>
+                    <li class="list-group-item">
+                        If you have any questions, please contact Dr. Philipp Chapkovski at University Duisburg-Essen
+                        (email: filipp.chapkovskii@uni-due.de).
+                    </li>
+
+
+                   
+
+
+                    <li class="list-group-item text-danger font-italic">
+                        {% formfields %}
+                    </li>
+
+                </ul>
+
+
+            </div>
+        </div>
+    </div>
+
+    {% next_button %}
+
+{% endblock %}

@@ -38,12 +38,12 @@
         {% if group.agreement %}
             <div class="alert alert-success text-center lead">
                 <div class="text-h1 display-1">😊</div>
-                Your partner <b class="green">AGREES</b> with you on on at least one of the following statements:
+                Your partner <b class="green">AGREES*</b> with you on on at least one of the following statements:
             </div>
         {% else %}
             <div class="alert alert-danger text-center lead">
                 <div class="text-h1 display-1">😞</div>
-                Your partner <b class="red">DISAGREES</b> with you on at least one of the following statements:
+                Your partner <b class="red">DISAGREES*</b> with you on at least one of the following statements:
             </div>
         {% endif %}
     {% endif %}
@@ -86,7 +86,7 @@
     </table>
     {% if  group.show_disagreement %}
         <div class="text-secondary font-italic">
-            Here, 'agree' means that you and your partner share similar views on certain statements. 'Disagree'
+            * Here, 'agree' means that you and your partner share similar views on certain statements. 'Disagree'
             indicates
             that your partner holds an opposite opinion from yours on the specified topics.
         </div>

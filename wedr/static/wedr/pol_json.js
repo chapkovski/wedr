@@ -85,8 +85,8 @@ const json = {
                     ]
                 }
             ],
-            "title": "Please indicate the extent to which you agree or disagree with each of the following statements by selecting a number from the scale provided.",
-            "description": "The scale ranges from 0, meaning 'Strongly Disagree,' to 5, meaning 'Completely Agree.' Choose the number that best represents your personal opinion for each statement.",
+            "title": "Please indicate the extent to which you agree or disagree with the following statement:",
+
             "questionsOrder": "random"
         }
     ],
