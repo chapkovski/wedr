@@ -3,7 +3,7 @@ import random
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
 from .models import Constants, encode_word_with_alphabet
-import emojis
+# import emojis
 import logging
 import json
 from datetime import timedelta, datetime, timezone

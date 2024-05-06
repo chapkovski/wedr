@@ -10,7 +10,7 @@ from otree.api import (
 )
 
 
-author = 'Your name here'
+author = 'Philipp Chapkovski'
 
 doc = """
 Your app description

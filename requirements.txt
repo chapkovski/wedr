@@ -1,5 +1,7 @@
-
 otree==3.4.0
 psycopg2==2.8.6
 pandas
-emojis
+#emojis
+PyYAML==6.0.1
+Jinja2
+MarkupSafe
