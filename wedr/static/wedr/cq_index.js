@@ -1,4 +1,4 @@
-const survey = new Survey.Model(js_vars.json);
+const survey = new Survey.Model(window.json);
 survey.onComplete.add((sender, options) => {
     var surveyData = JSON.stringify(sender.data, null, 3);
     $('#survey_data').val(surveyData);

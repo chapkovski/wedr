@@ -56,7 +56,6 @@ class Instructions2(Page):
 class CQPage(Page):
     pass
 
-
 class IntroToPol(Page):
     pass
 

@@ -1,4 +1,4 @@
-const json = {
+window.json = {
     "logoPosition": "right",
     "pages": [
         {
