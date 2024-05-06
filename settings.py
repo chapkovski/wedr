@@ -9,7 +9,7 @@ SESSION_CONFIGS = [
         app_sequence=[
             'start',
             'wedr',
-            # 'q'
+            'q'
         ]
     ),
     dict(
