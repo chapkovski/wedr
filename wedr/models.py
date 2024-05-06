@@ -31,12 +31,28 @@ logger = logging.getLogger(__name__)
 
 # 4. popup confirming success when the word is submitted correctly
 
-def has_disagreement(list1, list2):
-    return any(x != y for x, y in zip(list1, list2))
+def has_disagreement(dict1, dict2):
+    """
+    Check if there is any disagreement between two dictionaries.
+    Disagreement exists if for any key, the values in both dictionaries are different.
+
+    :param dict1: First dictionary of responses.
+    :param dict2: Second dictionary of responses.
+    :return: True if there is any disagreement, False otherwise.
+    """
+    return any(dict1.get(k) != dict2.get(k) for k in dict1 if k in dict2)
 
 
-def has_agreement(list1, list2):
-    return any(x == y for x, y in zip(list1, list2))
+def has_agreement(dict1, dict2):
+    """
+    Check if there is any agreement between two dictionaries.
+    Agreement exists if for any key, the values in both dictionaries are the same.
+
+    :param dict1: First dictionary of responses.
+    :param dict2: Second dictionary of responses.
+    :return: True if there is any agreement, False otherwise.
+    """
+    return any(dict1.get(k) == dict2.get(k) for k in dict1 if k in dict2)
 
 
 def split_alphabet_for_decoding(decoded_word, alphabet_to_emoji, n=10):
@@ -231,7 +247,8 @@ class Group(BaseGroup):
             treatment_key = self.treatment_key
             # let's count number of groups with show_details = True and show_details = False separately
             num_show_details = self.subsession.group_set.filter(show_details=True, treatment_key=treatment_key).count()
-            num_no_show_details = self.subsession.group_set.filter(show_details=False, treatment_key=treatment_key).count()
+            num_no_show_details = self.subsession.group_set.filter(show_details=False,
+                                                                   treatment_key=treatment_key).count()
             if num_show_details > num_no_show_details:
                 self.show_details = False
             elif num_show_details < num_no_show_details:
@@ -271,30 +288,24 @@ class Player(BasePlayer):
         if 'start' not in self.session.config.get('app_sequence'):
             data = start_constants.polq_data.copy()
             response_mapping = start_constants.response_mapping.copy()
-            full_polarizing_set = []
-            full_neutral_set = []
-
+            full_polarizing_set = {}
+            full_neutral_set = {}
+            threshold = 3
             for item in data:
                 response_value = random.randint(0, 5)
-                response_text = response_mapping.get(response_value)
-                if item['treatment'] == 'polarizing':
-                    full_polarizing_set.append(response_value)
-                else:
-                    full_neutral_set.append(response_value)
-
+                item['response_text'] = response_mapping[response_value]
                 item['user_response'] = response_value
-                item['response_text'] = response_text
+                if item['treatment'] == 'polarizing':
+                    full_polarizing_set[item['name']] = response_value
+                else:
+                    full_neutral_set[item['name']] = response_value
+
             self.survey_data = json.dumps(data)
             v['survey_data'] = data
             v['full_polarizing_set'] = full_polarizing_set
             v['full_neutral_set'] = full_neutral_set
-
-            v['polarizing_set'] = [i >= 3 for i in v['full_polarizing_set']]
-            v['neutral_set'] = [i >= 3 for i in v['full_neutral_set']]
-
-            v['polarizing_score'] = sum(v['full_polarizing_set']) / 3
-            v['neutral_score'] = sum(v['full_neutral_set']) / 3
-
+            v['polarizing_set'] = {k: v >= threshold for k, v in full_polarizing_set.items()}
+            v['neutral_set'] = {k: v >= threshold for k, v in full_neutral_set.items()}
         self.full_polarizing_set = json.dumps(v['full_polarizing_set'])
         self.full_neutral_set = json.dumps(v['full_neutral_set'])
         self.polarizing_set = json.dumps(v['polarizing_set'])

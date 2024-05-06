@@ -7,6 +7,7 @@ from .models import Constants, encode_word_with_alphabet
 import logging
 import json
 from datetime import timedelta, datetime, timezone
+from pprint import pprint
 
 logger = logging.getLogger(__name__)
 
@@ -78,16 +79,18 @@ class WorkingPage(Page):
         return super().post()
 
 
-
-
 class MatchPage(Page):
     def is_displayed(self):
         return self.round_number == 1
+
     def js_vars(self):
         return dict(seconds_on_page=Constants.seconds_on_page)
+
     def vars_for_template(self):
         treatment = self.group.treatment
         my_answers = json.loads(self.player.survey_data)
+        pprint(my_answers)
+        print('$' * 100)
         partner_answers = json.loads(self.player.get_partner().survey_data)
         # let's update the data to include color: if the user_response value is <3 color 'lightred' and 'lightgreen' otherwise
         for i in my_answers:
@@ -95,8 +98,7 @@ class MatchPage(Page):
         for i in partner_answers:
             i['color'] = 'lightred' if i['user_response'] < 3 else 'lightgreen'
 
-
-        my_relevant_answers  = [i for i in my_answers if i['treatment'] == treatment]
+        my_relevant_answers = [i for i in my_answers if i['treatment'] == treatment]
         partner_relevant_answers = [i for i in partner_answers if i['treatment'] == treatment]
         if not self.group.show_disagreement:
             my_relevant_answers = my_answers
@@ -109,14 +111,12 @@ class MatchPage(Page):
 
 
 class PartnerWP(WaitPage):
-
-
     after_all_players_arrive = 'set_up_game'
 
 
 page_sequence = [
     GameSettingWP,
     MatchPage,
-    # PartnerWP,
-    # WorkingPage,
+    PartnerWP,
+    WorkingPage,
 ]

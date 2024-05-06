@@ -8,7 +8,8 @@ SESSION_CONFIGS = [
         num_demo_participants=8,
         app_sequence=[
             'start',
-            # 'wedr', 'q'
+            'wedr',
+            # 'q'
         ]
     ),
     dict(

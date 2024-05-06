@@ -73,8 +73,6 @@ class PolPage(Page):
         try:
 
             json_data = json.loads(raw_data)
-            pprint(json_data)
-            print('*' * 100)
             data = Constants.polq_data.copy()
             response_mapping = Constants.response_mapping.copy()
             user_responses = json_data
@@ -98,21 +96,11 @@ class PolPage(Page):
             self.participant.vars['survey_data'] = data
             self.participant.vars['full_polarizing_set'] = polarizing_set
             self.participant.vars['full_neutral_set'] = neutral_set
-
             self.participant.vars['polarizing_set'] = {k: v >= threshold for k, v in polarizing_set.items()}
             self.player.polarizing_set = json.dumps(self.player.participant.vars['polarizing_set'])
             self.participant.vars['neutral_set'] = {k: v >= threshold for k, v in neutral_set.items()}
             self.player.neutral_set = json.dumps(self.player.participant.vars['neutral_set'])
-
             self.player.survey_data = json.dumps(data)
-
-
-
-
-
-
-
-
         except JSONDecodeError as e:
             print('*' * 100)
             print(str(e))
