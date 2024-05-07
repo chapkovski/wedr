@@ -233,11 +233,15 @@ class Group(BaseGroup):
             return None
 
     def set_treatment(self):
-        treatment_key = self.choose_treatment()
-        if treatment_key:
-            self.treatment_key = treatment_key
+        if self.session.config.get('default_treatment') =='':
+            treatment_key = self.choose_treatment()
+            if treatment_key:
+                self.treatment_key = treatment_key
+            else:
+                raise Exception("No feasible treatment found")
         else:
-            raise Exception("No feasible treatment found")
+            treatment_key = self.session.config.get('default_treatment')
+            self.treatment_key = treatment_key
         self.treatment = Constants.treatment_options[treatment_key]['treatment']
         self.agreement = Constants.treatment_options[treatment_key]['agree']
         self.show_disagreement = Constants.treatment_options[treatment_key]['info']
