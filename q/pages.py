@@ -39,4 +39,4 @@ class Q1(Page):
         return super().post()
 
 
-page_sequence = [Q1, Feedback, FinalForProlific]
+page_sequence = [Feedback,Q1,  FinalForProlific]
