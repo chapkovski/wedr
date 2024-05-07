@@ -131,6 +131,7 @@ class Constants(BaseConstants):
     treatment_options = {
         'polar_disagree_info': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
         'polar_disagree_noinfo': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': False},
+        'polar_disagree_details': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
         'polar_agree_info': {'treatment': POLARIZING_TREATMENT, 'agree': True, 'info': True},
         'neutral_disagree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': False, 'info': True},
         'neutral_agree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': True, 'info': True}
@@ -142,7 +143,10 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
 
     def creating_session(self):
-        pass
+        default_treatment = self.session.config.get('default_treatment')
+        if default_treatment != '':
+            assert self.session.config.get(
+                'default_treatment') in Constants.treatment_options.keys(), 'Invalid default treatment'
 
 
 class Group(BaseGroup):
@@ -233,7 +237,7 @@ class Group(BaseGroup):
             return None
 
     def set_treatment(self):
-        if self.session.config.get('default_treatment') =='':
+        if self.session.config.get('default_treatment') == '':
             treatment_key = self.choose_treatment()
             if treatment_key:
                 self.treatment_key = treatment_key
@@ -245,20 +249,7 @@ class Group(BaseGroup):
         self.treatment = Constants.treatment_options[treatment_key]['treatment']
         self.agreement = Constants.treatment_options[treatment_key]['agree']
         self.show_disagreement = Constants.treatment_options[treatment_key]['info']
-        if self.treatment_key == 'polar_disagree_noinfo':
-            self.show_details = False
-        else:
-            treatment_key = self.treatment_key
-            # let's count number of groups with show_details = True and show_details = False separately
-            num_show_details = self.subsession.group_set.filter(show_details=True, treatment_key=treatment_key).count()
-            num_no_show_details = self.subsession.group_set.filter(show_details=False,
-                                                                   treatment_key=treatment_key).count()
-            if num_show_details > num_no_show_details:
-                self.show_details = False
-            elif num_show_details < num_no_show_details:
-                self.show_details = True
-            else:
-                self.show_details = random.choice([True, False])
+        self.show_details = self.treatment_key == 'polar_disagree_details'
 
     def set_up_game(self):
         g = self
