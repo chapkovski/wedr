@@ -26,7 +26,7 @@ SESSION_CONFIGS = [
     ),
     dict(
         name='q',
-        display_name="q only",
+        display_name="post experimental q only",
         num_demo_participants=2,
         app_sequence=['q']
     ),

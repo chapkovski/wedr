@@ -1,0 +1,141 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+    <style>
+        .otree-body {
+            max-width: 100%;
+        }
+    </style>
+    <script>
+        window.json = {
+            "title": "Team Performance and Political Views Survey",
+            "showPrevButton": false,
+            "completeText": "Next",
+            "showCompletedPage": false,
+            showProgressBar: 'auto',
+            progressBarType: "questions",
+            "pages": [
+                {
+                    "name": "team_communication",
+                    "elements": [
+                        {
+                            "type": "radiogroup",
+                            "name": "team_satisfaction",
+                            "isRequired": true,
+                            "title": "How satisfied are you with your team’s overall performance?",
+                            "choices": [
+                                "Very Dissatisfied",
+                                "Dissatisfied",
+                                "Neutral",
+                                "Satisfied",
+                                "Very Satisfied"
+                            ]
+                        },
+                        {
+                            "type": "rating",
+                            "name": "team_communication_effectiveness",
+                            "isRequired": true,
+                            "title": "On a scale of 1 to 10, where 1 means 'Not effective at all' and 10 means 'Extremely effective,' how effectively do you feel your team communicated during the task?",
+                            "rateCount": 10,
+                            "rateMax": 10,
+                            "minRateDescription": "Not effective at all",
+                            "maxRateDescription": "Extremely effective"
+                        },
+                        {
+                            "type": "rating",
+                            "name": "self_effort",
+                            "isRequired": true,
+                            "title": "On a scale from 1 to 10, where 1 means 'Very Low' and 10 means 'Very High,' how would you rate your own effort and participation in the team activities?",
+                            "rateCount": 10,
+                            "rateMax": 10,
+                            "minRateDescription": "Very Low",
+                            "maxRateDescription": "Very High"
+                        },
+                        {
+                            "type": "rating",
+                            "name": "partner_effort",
+                            "isRequired": true,
+                            "title": "On a scale from 1 to 10, where 1 means 'Very Low' and 10 means 'Very High,' how would you rate the effort and participation of the partner you were matched with in the team activities?",
+                            "rateCount": 10,
+                            "rateMax": 10,
+                            "minRateDescription": "Very Low",
+                            "maxRateDescription": "Very High"
+                        },
+                        {
+                            "type": "rating",
+                            "name": "opinion_impact",
+                            "isRequired": true,
+                            "title": "On a scale from 1 to 10, where 1 means 'No impact at all' and 10 means 'Significantly impacted,' to what extent did differences in opinion within your team impact task performance?",
+                            "rateCount": 10,
+                            "rateMax": 10,
+                            "minRateDescription": "No impact at all",
+                            "maxRateDescription": "Significantly impacted"
+                        },
+
+                    ]
+                },
+                {
+                    "name": "political_views",
+                    "elements": [
+                        {
+                            "type": "rating",
+                            "name": "political_orientation",
+                            "title": "In political matters people talk of 'the left' and 'the right'. Please imagine for a moment a scale, from 1 to 10, where 1 means very left  and 10 means very right. How would you place your views on this scale?",
+                            "rateCount": 10,
+                            "rateMax": 10,
+                            "minRateDescription": "No impact at all",
+                            "maxRateDescription": "Significantly impacted"
+                            "isRequired": true,
+
+                        },
+                        {
+                            "type": "radiogroup",
+                            "name": "interest_in_us_politics",
+                            "isRequired": true,
+                            "title": "In everyday life, we have to deal with many different issues, where we feel more or less interested. Please indicate whether you are interested in the US politics:",
+                            "choices": [
+                                "1 Very interested",
+                                "2 Moderately interested",
+                                "3 Not at all interested"
+                            ]
+                        },
+                        {
+                            "type": "radiogroup",
+                            "name": "political_discussion_at_work",
+                            "isRequired": true,
+                            "title": "How appropriate do you find discussing politics with your colleagues at work?",
+                            "choices": [
+                                "Very Inappropriate",
+                                "Inappropriate",
+                                "Neutral",
+                                "Appropriate",
+                                "Very Appropriate"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    </script>
+
+    <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/survey-jquery/1.10.2/survey.jquery.min.js"
+            integrity="sha512-by0UtPaZIVW4faiqEE/cF3cSNhdGCDgliGE8gluMCu+ij3RJXutFREJE9YXuUfDqqVAge+8uqP9KAd1zZjMDog=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/survey-jquery@1.9.115/themes/index.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/survey-jquery@1.9.115/defaultV2.min.css"/>
+    <input type="hidden" id="survey_data" value="" name="survey_data">
+
+    <div id="surveyElement" style=""></div>
+
+
+
+    <script src="{% static 'wedr/cq_index.js' %}"></script>
+
+
+{% endblock %}

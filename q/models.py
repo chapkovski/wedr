@@ -32,9 +32,11 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+
+    purpose = models.LongStringField(label='What do you think was the purpose of the study?')
     instructions_clarity = models.IntegerField(label="""
        How clear and understandable were the instructions to you? (Please write your answer between 1 = not understandable at all and 5 = completely understandable)
        """, choices=range(1, 6), widget=widgets.RadioSelectHorizontal)
     feedback=models.LongStringField(
-        label=''
+        label="Please provide any feedback you have about the study. What did you like? What did you dislike? What could be improved?"
     )
