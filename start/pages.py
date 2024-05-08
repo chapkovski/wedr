@@ -137,14 +137,14 @@ class GuessPage(Page):
 
 
 page_sequence = [
-    # Consent,
-    # Intro,
-    # Instructions1,
-    # Instructions2,
-    # CQPage,
-    # IntroToPol,
+    Consent,
+    Intro,
+    Instructions1,
+    Instructions2,
+    CQPage,
+    IntroToPol,
     PolPage,
-    # IntroGuess,
-    # GuessPage,
+    IntroGuess,
+    GuessPage,
 
 ]
