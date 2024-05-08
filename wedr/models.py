@@ -123,11 +123,12 @@ class Constants(BaseConstants):
         words = [i.strip() for i in f.readlines()]
 
     num_rounds = 7
-    seconds_on_page = 20 # how much time they should stay at the page with info about the partner
+    seconds_on_page = 20  # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
     POLARIZING_TREATMENT = 'polarizing'
     NEUTRAL_TREATMENT = 'neutral'
     treatments = [POLARIZING_TREATMENT, NEUTRAL_TREATMENT]
+    treatment_keys = ['polar_disagree_info', 'polar_disagree_noinfo']
     treatment_options = {
         'polar_disagree_info': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
         'polar_disagree_noinfo': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': False},
@@ -219,6 +220,7 @@ class Group(BaseGroup):
         return feasible_treatment_counts
 
     def choose_treatment(self):
+        return Constants.treatment_keys[self.id_in_subsession % 2]
         feasible_treatment_counts = self.filter_feasible_treatments()
         # if it is not available let's replace it by {'polar_disagree_info': 0, 'polar_disagree_noinfo': 0}
         if not feasible_treatment_counts:
