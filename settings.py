@@ -36,10 +36,11 @@ SESSION_CONFIGS = [
 # in SESSION_CONFIGS, except those that explicitly override it.
 # the session config can be accessed from methods in your apps as self.session.config,
 # e.g. self.session.config['participation_fee']
-
+NO_PARTNER_CODE = environ.get('NO_PARTNER_CODE', 'NO_PARTNER')
+PROLIFIC_RETURN_CODE = environ.get('PROLIFIC_RETURN_CODE', 'NO_CODE')
 SESSION_CONFIG_DEFAULTS = dict(
-    no_partner_url="https://app.prolific.co/submissions/complete?cc=NO_PARTNER",
-    prolific_return_url="https://app.prolific.com/submissions/complete?cc=NO_CODE",
+    no_partner_url=f"https://app.prolific.co/submissions/complete?cc={NO_PARTNER_CODE}",
+    prolific_return_url=f"https://app.prolific.com/submissions/complete?cc={PROLIFIC_RETURN_CODE}",
     for_prolific=True,
     real_world_currency_per_point=1.00, participation_fee=0.00, doc="",
     time_for_work=5 * 600,
