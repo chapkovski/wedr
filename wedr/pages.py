@@ -15,9 +15,17 @@ logger = logging.getLogger(__name__)
 class GameSettingWP(WaitPage):
     template_name = 'wedr/FirstWP.html'
     group_by_arrival_time = True
-    min_to_wait = 5
-    body_text = f"If you wait for more than {min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
+
+    @property
+    def body_text(self):
+        body_text = f"If you wait for more than {self.min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
+        return body_text
+
     after_all_players_arrive = 'set_treatment'
+
+    @property
+    def min_to_wait(self):
+        return self.session.config.get('min_to_wait', 5)
 
     def is_displayed(self):
         return self.round_number == 1

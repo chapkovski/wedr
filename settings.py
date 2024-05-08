@@ -44,6 +44,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     real_world_currency_per_point=1.00, participation_fee=0.00, doc="",
     time_for_work=5 * 600,
     default_treatment='',
+    min_to_wait=7,
 )
 
 # ISO-639 code
