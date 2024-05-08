@@ -78,3 +78,9 @@ pages:
           - "$100,000 - $150,000"
           - "More than $150,000"
           - "Prefer not to answer"
+  - name: intro_page
+    elements:
+      - type: html
+        name: intro_text
+        html: Now we will ask you to state whether you agree or disagree with specific
+          statements. Click 'Next' to proceed.
