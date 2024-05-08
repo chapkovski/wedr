@@ -71,6 +71,7 @@ class Constants(BaseConstants):
     df = pd.read_csv('data/polquestions.csv')
     # let's convert the dataframe to a dictionary
     polq_data = df.to_dict('records')
+
     polarizing = df[df['treatment'] == 'polarizing']['name'].tolist()
     neutral = df[df['treatment'] == 'neutral']['name'].tolist()
     response_mapping = {
@@ -86,6 +87,38 @@ class Constants(BaseConstants):
         yaml_template = yaml_file.read()
         rendered_yaml = Template(yaml_template).render({})
         survey_prototype = yaml.safe_load(rendered_yaml)
+
+
+def create_statement_page(statement):
+    return {
+        "name": f"{statement['name']}_page",
+        "elements": [
+            {
+                "type": "html",
+                "name": statement["name"],
+                "html": f"<div class='lead text-center display-3' style='font-size:1.2rem'><i>{statement['text']}</i></div>"
+            },
+            {
+                "type": "radiogroup",
+                "name": f"{statement['name']}_guess",
+                "title": "Please consider the statement above and indicate your guess by choosing one of the following options:",
+                "choices": [
+                    {'value': 0, 'text': "My partner has a similar opinion (similar answers to mine)"},
+                    {'value': 1, 'text': "My partner has an opposite opinion (opposite answers to mine)"},
+
+                ]
+            }
+        ]
+    }
+
+
+def make_guess_survey():
+    stub = dict(pages=[], showPrevButton=False, completeText="Next", showCompletedPage=False, showProgressBar='auto',
+                progressBarType="questions")
+    polq_data = deepcopy(Constants.polq_data.copy())
+    random.shuffle(polq_data)
+    stub['pages'] = [create_statement_page(statement) for statement in polq_data]
+    return stub
 
 
 class Subsession(BaseSubsession):
@@ -115,6 +148,14 @@ class Player(BasePlayer):
                     consent I am not giving up any of my legal rights.""",
         widget=widgets.CheckboxInput
     )
+    #     guessing block
+    books_guess = models.IntegerField()
+    cars_guess = models.IntegerField()
+    cities_guess = models.IntegerField()
+    immigration_guess = models.IntegerField()
+    partisanship_guess = models.IntegerField()
+    women_guess = models.IntegerField()
+
     full_neutral_set = models.StringField()
     full_polarizing_set = models.StringField()
     neutral_set = models.StringField()

@@ -1,6 +1,6 @@
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
-from .models import Constants
+from .models import Constants, make_guess_survey
 import json
 from json import JSONDecodeError
 from pprint import pprint
@@ -56,6 +56,7 @@ class Instructions2(Page):
 class CQPage(Page):
     pass
 
+
 class IntroToPol(Page):
     pass
 
@@ -108,6 +109,33 @@ class PolPage(Page):
         return super().post()
 
 
+class IntroGuess(Page):
+    pass
+
+
+class GuessPage(Page):
+    def js_vars(self):
+        return dict(json=make_guess_survey())
+
+    def post(self):
+        raw_data = self.request.POST.get('survey_data')
+        try:
+            user_responses = json.loads(raw_data)
+            pprint(user_responses)
+            for k, v in user_responses.items():
+                try:
+                    setattr(self.player, k, v)
+                except AttributeError as e:
+                    logger.error(
+                        f'No such field at player level: {k} for value {v}. Player {self.player.participant.code}. Error: {e}')
+        except JSONDecodeError as e:
+            print('*' * 100)
+            print(str(e))
+            print('No data')
+        print('*' * 100)
+        return super().post()
+
+
 page_sequence = [
     Consent,
     Intro,
@@ -116,4 +144,7 @@ page_sequence = [
     CQPage,
     IntroToPol,
     PolPage,
+    IntroGuess,
+    GuessPage,
+
 ]

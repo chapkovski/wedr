@@ -1,0 +1,25 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Guessing answers of your partner
+{% endblock %}
+
+{% block content %}
+
+       <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/survey-jquery/1.10.2/survey.jquery.min.js" integrity="sha512-by0UtPaZIVW4faiqEE/cF3cSNhdGCDgliGE8gluMCu+ij3RJXutFREJE9YXuUfDqqVAge+8uqP9KAd1zZjMDog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/survey-jquery@1.9.115/themes/index.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/survey-jquery@1.9.115/defaultV2.min.css" />
+    <input type="hidden" id="survey_data" value="" name="survey_data">
+
+    <div id="surveyElement" style=""></div>
+
+
+    <script>
+    window.json = js_vars.json
+    </script>
+    <script src="{% static 'wedr/cq_index.js' %}"></script>
+
+
+{% endblock %}

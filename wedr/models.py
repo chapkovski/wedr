@@ -123,7 +123,7 @@ class Constants(BaseConstants):
         words = [i.strip() for i in f.readlines()]
 
     num_rounds = 7
-    seconds_on_page = 15  # how much time they should stay at the page with info about the partner
+    seconds_on_page = 20 # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
     POLARIZING_TREATMENT = 'polarizing'
     NEUTRAL_TREATMENT = 'neutral'
@@ -131,10 +131,10 @@ class Constants(BaseConstants):
     treatment_options = {
         'polar_disagree_info': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
         'polar_disagree_noinfo': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': False},
-        'polar_disagree_details': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
-        'polar_agree_info': {'treatment': POLARIZING_TREATMENT, 'agree': True, 'info': True},
-        'neutral_disagree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': False, 'info': True},
-        'neutral_agree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': True, 'info': True}
+        # 'polar_disagree_details': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
+        # 'polar_agree_info': {'treatment': POLARIZING_TREATMENT, 'agree': True, 'info': True},
+        # 'neutral_disagree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': False, 'info': True},
+        # 'neutral_agree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': True, 'info': True}
     }
     with open('data/polquestions.csv', 'r') as f:
         statements = list(csv.DictReader(f))
@@ -220,6 +220,9 @@ class Group(BaseGroup):
 
     def choose_treatment(self):
         feasible_treatment_counts = self.filter_feasible_treatments()
+        # if it is not available let's replace it by {'polar_disagree_info': 0, 'polar_disagree_noinfo': 0}
+        if not feasible_treatment_counts:
+            feasible_treatment_counts = {'polar_disagree_info': 0, 'polar_disagree_noinfo': 0}
 
         # Find the minimum count among the feasible treatments
         min_count = min(feasible_treatment_counts.values())

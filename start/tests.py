@@ -34,6 +34,12 @@ def generate_random_response():
     return response
 
 
+def generate_random_guess():
+    keys = ['books', 'cars', 'cities', 'partisanship', 'women', 'immigration']
+    response = {f'{key}_guess': random.choice([0,1]) for key in keys}
+    return response
+
+
 class PlayerBot(Bot):
     def play_round(self):
         yield pages.Consent, {"consent_accept": True}
@@ -45,3 +51,7 @@ class PlayerBot(Bot):
         raw_data = json.dumps(generate_random_response())
         yield Submission(pages.PolPage, dict(survey_data=raw_data,
                                              ), check_html=False)
+        yield pages.IntroGuess
+        # let's prepare guess survey data
+        survey_data = (json.dumps(generate_random_guess()))
+        yield Submission(pages.GuessPage, dict(survey_data=survey_data), check_html=False)

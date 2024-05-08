@@ -1,0 +1,40 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Instructions: Guessing answers of your partner
+{% endblock %}
+
+
+
+
+
+
+
+
+
+{% block content %}
+    <div class="card my-3 ">
+        <div class="card-body">
+            <div class="card-text">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        In the next section, we'd like you to guess whether a partner you'll be working with has a
+                        similar or opposite opinion regarding the statements you just shared your opinions on.
+                    </li>
+                    <li class="list-group-item">
+                        Please consider each statement and indicate your guess by choosing one of the following options:
+                    </li>
+                    <li class="list-group-item font-italic">
+                        - My partner has a similar opinion (similar answers to mine)
+                    </li>
+                    <li class="list-group-item font-italic">
+                        - My partner has an opposite opinion (opposite answers to mine)
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% next_button %}
+
+{% endblock %}
