@@ -65,7 +65,7 @@ def load_csv_to_survey_pages(polq_data, choices):
 
 class Constants(BaseConstants):
     name_in_url = 'start'
-    players_per_group = None
+    players_per_group = 2
     num_rounds = 1
     # let's use pandas to read csv in data/polqustions.csv and create two lists: polarizing and neutral based on treatment key
     df = pd.read_csv('data/polquestions.csv')
