@@ -1,6 +1,7 @@
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
 from .models import Constants
+from django.shortcuts import redirect
 import json
 from json import JSONDecodeError
 from pprint import pprint
@@ -34,9 +35,17 @@ class Consent(Page):
 
 
 class Intro(Page):
+    timeout_seconds = 10
     def vars_for_template(self):
         return dict(num_puzzles=wedr_constants.num_rounds)
+    def post(self):
 
+        timeout_happened = raw_data = self.request.POST.get('timeout_happened', False)
+        if timeout_happened:
+
+            full_return_url = self.session.config.get("prolific_timeout_code", "https://cnn.com")
+            return redirect(full_return_url)
+        return super().post()
 
 class Instructions1(Page):
     def vars_for_template(self):

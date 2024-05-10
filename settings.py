@@ -38,7 +38,9 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 NO_PARTNER_CODE = environ.get('NO_PARTNER_CODE', 'NO_PARTNER')
 PROLIFIC_RETURN_CODE = environ.get('PROLIFIC_RETURN_CODE', 'NO_CODE')
+PROLIFIC_TIMEOUT_CODE = environ.get('PROLIFIC_TIMEOUT_CODE', 'TIMEOUT')
 SESSION_CONFIG_DEFAULTS = dict(
+    prolific_timeout_code=f"https://app.prolific.co/submissions/complete?cc={PROLIFIC_TIMEOUT_CODE}",
     no_partner_url=f"https://app.prolific.co/submissions/complete?cc={NO_PARTNER_CODE}",
     prolific_return_url=f"https://app.prolific.com/submissions/complete?cc={PROLIFIC_RETURN_CODE}",
     for_prolific=True,
