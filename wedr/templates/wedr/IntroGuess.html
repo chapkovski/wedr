@@ -4,7 +4,7 @@
 {% block title %}
 
 
-    Instructions for the Guessing Task
+    Additional task: Instructions
 {% endblock %}
 
 
@@ -14,15 +14,14 @@
             <div class="card-text">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
+                        There is a possibility to earn an additional bonus in this study.
+                    </li>
+                    <li class="list-group-item">
 
-                        Certainly! Here's the instruction with more specific wording:
 
-                        Instructions for the Guessing Task
-
-                        In this task, you will work together with your partner. Your goal is to understand your
-                        partner's position on the same statements where you've just shared your own opinions. After
-                        completing the tasks, you'll be asked to state your partner's positions for each of the
-                        following statements, using the same scale (from 'Strongly Disagree' to 'Strongly Agree').
+                        You can earn a bonus in this study. To qualify, ask your partner what answers they gave on the
+                        same statements you also answered. After completing the tasks, you will indicate your partner's
+                        opinions using the same scale, from 'strongly disagree' to 'strongly agree.'
                     </li>
                     <li class="list-group-item lead text-center">
                         Here are the statements:
@@ -33,7 +32,8 @@
                         </li>
                     {% endfor %}
                     <li class="list-group-item">
-                        If your guesses are accurate, you'll receive a £{{ session.config.payment_for_guess }} bonus.
+                        If your answers match your partner's responses, you will earn a bonus of £{{ session.config.payment_for_guess }}.
+
                     </li>
 
                 </ul>
