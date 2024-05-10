@@ -283,6 +283,7 @@ class Player(BasePlayer):
             utc_time=data['utcTime'],
             owner=self.participant,
             owner_group=self.group.id_in_subsession,
+            round_number=self.round_number,
             message=data['message'],
         )
         return {'type': 'message', 'who': self.participant.code, 'message': data['message']}
@@ -330,3 +331,4 @@ class Message(djmodels.Model):
     owner = djmodels.ForeignKey(to=Participant, on_delete=djmodels.CASCADE, related_name='messages')
     owner_group = models.IntegerField()
     message = models.StringField()
+    round_number = models.IntegerField()

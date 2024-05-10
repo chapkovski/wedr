@@ -16,7 +16,6 @@ from django_user_agents.utils import get_user_agent
 
 class Consent(Page):
     def get(self, *args, **kwargs):
-
         user_agent = get_user_agent(self.request)
         logger.info(f'User agent: {user_agent}')
         self.player.full_user_data = json.dumps(user_agent.__dict__)
@@ -36,16 +35,17 @@ class Consent(Page):
 
 class Intro(Page):
     timeout_seconds = 60
+
     def vars_for_template(self):
         return dict(num_puzzles=wedr_constants.num_rounds)
-    def post(self):
 
+    def post(self):
         timeout_happened = raw_data = self.request.POST.get('timeout_happened', False)
         if timeout_happened:
-
             full_return_url = self.session.config.get("prolific_timeout_code", "https://cnn.com")
             return redirect(full_return_url)
         return super().post()
+
 
 class Instructions1(Page):
     def vars_for_template(self):

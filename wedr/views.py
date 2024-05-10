@@ -45,6 +45,7 @@ class MessageDataExport(PandasExport):
         fields = ("owner__code",
 
                   "owner__session__code",
+                  "round_number",
                   "utc_time",
                   "message",
 
