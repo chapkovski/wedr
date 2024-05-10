@@ -42,14 +42,14 @@ class MessageDataExport(PandasExport):
     content_type = "text/csv"
 
     def get_data(self, params):
-        fields = ("owner__participant__code",
-                  "owner__round_number",
+        fields = ("owner__code",
+
                   "owner__session__code",
                   "utc_time",
                   "message",
 
                   )
-        messages = Message.objects.all().values(*fields)
+        messages = Message.objects.all().order_by("owner__session",'utc_time').values(*fields)
         if not messages.exists():
             return
         if messages.exists():

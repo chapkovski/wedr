@@ -88,7 +88,9 @@ class WorkingPage(Page):
 
 class PartnerWP(WaitPage):
     after_all_players_arrive = 'set_up_game'
-
+    def is_displayed(self):
+        if self.player.remaining_time <= 0:
+            return False
 
 class IntroGuess(Page):
     def is_displayed(self):
