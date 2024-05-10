@@ -1,0 +1,45 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+
+
+    Instructions for the Guessing Task
+{% endblock %}
+
+
+{% block content %}
+    <div class="card my-3 ">
+        <div class="card-body">
+            <div class="card-text">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+
+                        Certainly! Here's the instruction with more specific wording:
+
+                        Instructions for the Guessing Task
+
+                        In this task, you will work together with your partner. Your goal is to understand your
+                        partner's position on the same statements where you've just shared your own opinions. After
+                        completing the tasks, you'll be asked to state your partner's positions for each of the
+                        following statements, using the same scale (from 'Strongly Disagree' to 'Strongly Agree').
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        Here are the statements:
+                    </li>
+                    {% for s in statements %}
+                        <li class="list-group-item font-italic lead text-center">
+                            {{ s.text }}
+                        </li>
+                    {% endfor %}
+                    <li class="list-group-item">
+                        If your guesses are accurate, you'll receive a £{{ session.config.payment_for_guess }} bonus.
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% next_button %}
+
+{% endblock %}

@@ -3,7 +3,7 @@ import random
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
 from .models import Constants, encode_word_with_alphabet
-
+from start.models import Constants as start_constants
 import logging
 import json
 from datetime import timedelta, datetime, timezone
@@ -15,13 +15,11 @@ logger = logging.getLogger(__name__)
 class GameSettingWP(WaitPage):
     template_name = 'wedr/FirstWP.html'
     group_by_arrival_time = True
-
+    after_all_players_arrive = 'set_treatment'
     @property
     def body_text(self):
         body_text = f"If you wait for more than {self.min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
         return body_text
-
-    after_all_players_arrive = 'set_treatment'
 
     @property
     def min_to_wait(self):
@@ -87,15 +85,21 @@ class WorkingPage(Page):
         return super().post()
 
 
-
-
 class PartnerWP(WaitPage):
     after_all_players_arrive = 'set_up_game'
 
 
+class IntroGuess(Page):
+    def is_displayed(self):
+        return self.round_number == 1
+    def vars_for_template(self):
+        qs_order = self.participant.vars.get('qs', [])
+        qs = [next(q for q in start_constants.polq_data if q['name'] == name) for name in qs_order]
+        return dict(statements=qs)
+
 page_sequence = [
     GameSettingWP,
-
+    IntroGuess,
     PartnerWP,
     WorkingPage,
 ]

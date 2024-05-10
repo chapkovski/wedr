@@ -104,18 +104,25 @@ class Constants(BaseConstants):
     seconds_on_page = 20  # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
 
+
 class Subsession(BaseSubsession):
     pass
 
+
 class Group(BaseGroup):
-    treatment_key = models.StringField()
     treatment = models.StringField()
-    agreement = models.BooleanField()
-    show_disagreement = models.BooleanField()
-    show_details = models.BooleanField()
+
+    def set_treatment(self):
+        treatments = list(set([p.participant.vars.get('treatment', '') for p in self.get_players()]))
+        # check if both players have the same treatment and each treatmnt in start_constants.treatment
+        if len(treatments) == 1 and treatments[0] in start_constants.treatments:
+            self.treatment = treatments[0]
 
     def get_messages(self):
-        return Message.objects.filter(owner_group=self.id_in_subsession).order_by('utc_time')
+        return (Message.objects.
+                filter(owner_group=self.id_in_subsession,
+                       owner__session=self.session).
+                order_by('utc_time'))
 
     def set_up_game(self):
         g = self
@@ -145,44 +152,23 @@ class Player(BasePlayer):
 
         # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
         v = self.participant.vars
-        self.survey_data = json.dumps(v.get('survey_data', []))
         if 'start' not in self.session.config.get('app_sequence'):
-            data = start_constants.polq_data.copy()
-            response_mapping = start_constants.response_mapping.copy()
-            full_polarizing_set = {}
-            full_neutral_set = {}
-            threshold = 3
-            for item in data:
-                response_value = random.randint(0, 5)
-                item['response_text'] = response_mapping[response_value]
-                item['user_response'] = response_value
-                if item['treatment'] == 'polarizing':
-                    full_polarizing_set[item['name']] = response_value
-                else:
-                    full_neutral_set[item['name']] = response_value
+            index = (self.id_in_subsession - 1) // 2
+            treatment = start_constants.treatments[index % 2]
+            self.participant.vars['treatment'] = treatment
+            qs = [q['name'] for q in start_constants.polq_data if q['treatment'] == treatment]
+            print(f'qs: {qs}')
+            _qs = qs.copy()
+            random.shuffle(_qs)
+            self.participant.vars['qs'] = _qs
+        self.qs_order = json.dumps(v.get('qs', []))
 
-            self.survey_data = json.dumps(data)
-            v['survey_data'] = data
-            v['full_polarizing_set'] = full_polarizing_set
-            v['full_neutral_set'] = full_neutral_set
-            v['polarizing_set'] = {k: v >= threshold for k, v in full_polarizing_set.items()}
-            v['neutral_set'] = {k: v >= threshold for k, v in full_neutral_set.items()}
-        self.full_polarizing_set = json.dumps(v['full_polarizing_set'])
-        self.full_neutral_set = json.dumps(v['full_neutral_set'])
-        self.polarizing_set = json.dumps(v['polarizing_set'])
-        self.neutral_set = json.dumps(v['neutral_set'])
-
-    survey_data = models.LongStringField()
+    qs_order = models.StringField()
     partial_dict = models.StringField()
     time_elapsed = models.FloatField()
     start_time = djmodels.DateTimeField(null=True)
     completion_time = djmodels.DateTimeField(null=True)
     completed = models.BooleanField(default=False)
-
-    neutral_set = models.StringField()
-    polarizing_set = models.StringField()
-    full_neutral_set = models.StringField()
-    full_polarizing_set = models.StringField()
 
     def handle_message(self, data):
         logger.info('Got message', data)

@@ -108,6 +108,7 @@ class PolPage(Page):
             data = Constants.polq_data.copy()
             response_mapping = Constants.response_mapping.copy()
             user_responses = json_data
+            pprint(user_responses)
             for k, v in user_responses.items():
                 try:
                     setattr(self.player, k, str(v))
@@ -141,8 +142,6 @@ class PolPage(Page):
         return super().post()
 
 
-class IntroGuess(Page):
-    pass
 
 
 
@@ -156,7 +155,7 @@ page_sequence = [
     # CQPage,
     # IntroToPol,
     PolPage,
-    IntroGuess,
+
 
 
 ]
