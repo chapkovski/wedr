@@ -100,7 +100,7 @@ class Constants(BaseConstants):
     with open('data/words.csv', 'r') as f:
         words = [i.strip() for i in f.readlines()]
 
-    num_rounds = int(environ.get('NUM_WORDS', 5))
+    num_rounds = int(environ.get('NUM_ROUNDS', 20))
     seconds_on_page = 20  # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
 
@@ -117,6 +117,10 @@ class Group(BaseGroup):
         # check if both players have the same treatment and each treatmnt in start_constants.treatment
         if len(treatments) == 1 and treatments[0] in start_constants.treatments:
             self.treatment = treatments[0]
+        for p in self.get_players():
+            p.participant.vars['partner_polq'] = p.get_partner().participant.vars.get('own_polq', {})
+            p.own_polq = json.dumps(p.participant.vars.get('own_polq', {}))
+            p.partner_polq = json.dumps(p.participant.vars.get('partner_polq', {}))
 
     def set_time_over(self):
         default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
@@ -171,6 +175,8 @@ class Player(BasePlayer):
         self.qs_order = json.dumps(v.get('qs', []))
 
     qs_order = models.StringField()
+    own_polq = models.StringField()
+    partner_polq = models.StringField()
     partial_dict = models.StringField()
     time_elapsed = models.FloatField()
     start_time = djmodels.DateTimeField(null=True)

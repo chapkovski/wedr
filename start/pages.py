@@ -12,6 +12,7 @@ from pprint import pprint
 logger = logging.getLogger(__name__)
 from django_user_agents.utils import get_user_agent
 
+
 class GameSettingWP(WaitPage):
     template_name = 'wedr/FirstWP.html'
     group_by_arrival_time = True
@@ -43,7 +44,6 @@ class GameSettingWP(WaitPage):
         return {'currentTime': current_time, 'minToWait': self.min_to_wait}
 
 
-
 class Consent(Page):
     def get(self, *args, **kwargs):
         x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
@@ -52,7 +52,7 @@ class Consent(Page):
         else:
             ip = self.request.META.get('REMOTE_ADDR')
         if ip:
-            self.player.ip_address= ip
+            self.player.ip_address = ip
         user_agent = get_user_agent(self.request)
         logger.info(f'User agent: {user_agent}')
         self.player.full_user_data = json.dumps(user_agent.__dict__)
@@ -109,6 +109,7 @@ class PolPage(Page):
             response_mapping = Constants.response_mapping.copy()
             user_responses = json_data
             pprint(user_responses)
+            res = {}
             for k, v in user_responses.items():
                 try:
                     setattr(self.player, k, str(v))
@@ -116,34 +117,24 @@ class PolPage(Page):
                     logger.error(
                         f'No such field at player level: {k} for value {v}. Player {self.player.participant.code}. Error: {e}')
             for item in data:
-                response_value = user_responses.get(item['name'])
-                response_text = response_mapping.get(response_value)
-                item['user_response'] = response_value
-                item['response_text'] = response_text
+                name = item['name']
+                if name in user_responses:
+                    res[name] = dict(
+                        response_value=user_responses[name],
+                        response_text=response_mapping[user_responses[name]],
+                        text=item['text'],
+                    )
 
-            threshold = 3
-            polarizing_set = {k: v for k, v in json_data.items() if k in Constants.polarizing}
-            neutral_set = {k: v for k, v in json_data.items() if k in Constants.neutral}
-            self.player.full_polarizing_set = json.dumps(polarizing_set)
-            self.player.full_neutral_set = json.dumps(neutral_set)
-            self.participant.vars['survey_data'] = data
-            self.participant.vars['full_polarizing_set'] = polarizing_set
-            self.participant.vars['full_neutral_set'] = neutral_set
-            self.participant.vars['polarizing_set'] = {k: v >= threshold for k, v in polarizing_set.items()}
-            self.player.polarizing_set = json.dumps(self.player.participant.vars['polarizing_set'])
-            self.participant.vars['neutral_set'] = {k: v >= threshold for k, v in neutral_set.items()}
-            self.player.neutral_set = json.dumps(self.player.participant.vars['neutral_set'])
-            self.player.survey_data = json.dumps(data)
+            self.participant.vars['polq_data'] = res
+            self.participant.vars['own_polq'] = user_responses
+
+
         except JSONDecodeError as e:
             print('*' * 100)
             print(str(e))
             print('No data')
         print('*' * 100)
         return super().post()
-
-
-
-
 
 
 page_sequence = [
@@ -155,7 +146,4 @@ page_sequence = [
     # CQPage,
     # IntroToPol,
     PolPage,
-
-
-
 ]
