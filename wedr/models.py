@@ -103,7 +103,7 @@ class Constants(BaseConstants):
     num_rounds = int(environ.get('NUM_ROUNDS', 20))
     seconds_on_page = 20  # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
-
+    print(f'Number of rounds: {num_rounds}; Number of words: {len(words)}')
 
 class Subsession(BaseSubsession):
     pass

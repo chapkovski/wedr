@@ -6,79 +6,78 @@ showCompletedPage: false
 showProgressBar: 'auto'
 progressBarType: "questions"
 pages:
-
-#  - name: page_age
-#    elements:
-#      - type: radiogroup
-#        name: age
-#        title: What is your age?
-#        isRequired: true
-#        choices:
-#          - Under 18
-#          - 18 - 24
-#          - 25 - 34
-#          - 35 - 44
-#          - 45 - 54
-#          - 55 - 64
-#          - 65 - 74
-#          - 75 - 84
-#          - 85 or older
-#  - name: page_gender
-#    elements:
-#      - type: radiogroup
-#        name: gender
-#        title: What is your gender?
-#        isRequired: true
-#        choices:
-#          - Male
-#          - Female
-#          - Other
-#          - Prefer not to say
-#  - name: page_maritalStatus
-#    elements:
-#      - type: radiogroup
-#        name: maritalStatus
-#        title: What is your marital status?
-#        isRequired: true
-#        choices:
-#          - Single (never married)
-#          - Married, or in a domestic partnership
-#          - Widowed
-#          - Divorced
-#          - Separated
-#  - name: page_employmentStatus
-#    elements:
-#      - type: radiogroup
-#        name: employmentStatus
-#        title: What is your current employment status?
-#        isRequired: true
-#        choices:
-#          - Employed full time (35 or more hours per week)
-#          - Employed part time (up to 34 hours per week)
-#          - Unemployed and currently looking for work
-#          - Unemployed not currently looking for work
-#          - Student
-#          - Retired
-#          - Homemaker
-#          - Self-employed
-#          - Unable to work
-#  - name: page_householdIncome
-#    elements:
-#      - type: radiogroup
-#        name: householdIncome
-#        title: What is your annual household income?
-#        isRequired: true
-#        choices:
-#          - "$1,000 - $2,000"
-#          - "$2,000 - $5,000"
-#          - "$5,000 - $10,000"
-#          - "$10,000 - $25,000"
-#          - "$25,000 - $50,000"
-#          - "$50,000 - $75,000"
-#          - "$75,000 - $100,000"
-#          - "$100,000 - $150,000"
-#          - "More than $150,000"
-#          - "Prefer not to answer"
+  - name: page_age
+    elements:
+      - type: radiogroup
+        name: age
+        title: What is your age?
+        isRequired: true
+        choices:
+          - Under 18
+          - 18 - 24
+          - 25 - 34
+          - 35 - 44
+          - 45 - 54
+          - 55 - 64
+          - 65 - 74
+          - 75 - 84
+          - 85 or older
+  - name: page_gender
+    elements:
+      - type: radiogroup
+        name: gender
+        title: What is your gender?
+        isRequired: true
+        choices:
+          - Male
+          - Female
+          - Other
+          - Prefer not to say
+  - name: page_maritalStatus
+    elements:
+      - type: radiogroup
+        name: maritalStatus
+        title: What is your marital status?
+        isRequired: true
+        choices:
+          - Single (never married)
+          - Married, or in a domestic partnership
+          - Widowed
+          - Divorced
+          - Separated
+  - name: page_employmentStatus
+    elements:
+      - type: radiogroup
+        name: employmentStatus
+        title: What is your current employment status?
+        isRequired: true
+        choices:
+          - Employed full time (35 or more hours per week)
+          - Employed part time (up to 34 hours per week)
+          - Unemployed and currently looking for work
+          - Unemployed not currently looking for work
+          - Student
+          - Retired
+          - Homemaker
+          - Self-employed
+          - Unable to work
+  - name: page_householdIncome
+    elements:
+      - type: radiogroup
+        name: householdIncome
+        title: What is your annual household income?
+        isRequired: true
+        choices:
+          - "$1,000 - $2,000"
+          - "$2,000 - $5,000"
+          - "$5,000 - $10,000"
+          - "$10,000 - $25,000"
+          - "$25,000 - $50,000"
+          - "$50,000 - $75,000"
+          - "$75,000 - $100,000"
+          - "$100,000 - $150,000"
+          - "More than $150,000"
+          - "Prefer not to answer"
   - name: intro_page
     elements:
       - type: html
