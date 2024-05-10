@@ -76,7 +76,6 @@ def encode_word_with_alphabet(word):
 
     # Create a mapping between alphabets and a random set of emojis
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    random.seed(environ.get('SEED', 1))
     selected_emojis = random.sample(allowed_emojis, len(alphabet))
     alphabet_to_emoji = dict(zip(alphabet, selected_emojis))
 
