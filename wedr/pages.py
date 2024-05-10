@@ -99,7 +99,7 @@ class IntroGuess(Page):
 
 page_sequence = [
     GameSettingWP,
-    IntroGuess,
+    # IntroGuess,
     PartnerWP,
     WorkingPage,
 ]

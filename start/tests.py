@@ -34,11 +34,6 @@ def generate_random_response():
     return response
 
 
-def generate_random_guess():
-    keys = ['books', 'cars', 'cities', 'partisanship', 'women', 'immigration']
-    response = {f'{key}_guess': random.choice([0,1]) for key in keys}
-    return response
-
 
 class PlayerBot(Bot):
     def play_round(self):
