@@ -40,7 +40,7 @@ class GameSettingWP(WaitPage):
 
         # Convert to a format that JavaScript can parse
         utc_time_string = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-        current_time = self.participant.vars.setdefault('start_waiting_time', utc_time_string)
+        current_time = self.participant.vars.setdefault('start_waiting_time1', utc_time_string)
         return {'currentTime': current_time, 'minToWait': self.min_to_wait}
 
 
