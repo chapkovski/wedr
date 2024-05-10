@@ -14,7 +14,7 @@ from django.db import models as djmodels
 from django.db.models import Count
 from random import choices, sample
 import random
-from start.models import Constants as start_constants
+from matcher.models import Constants as matcher_constants
 import json
 import logging
 from collections import OrderedDict
@@ -114,8 +114,8 @@ class Group(BaseGroup):
 
     def set_treatment(self):
         treatments = list(set([p.participant.vars.get('treatment', '') for p in self.get_players()]))
-        # check if both players have the same treatment and each treatmnt in start_constants.treatment
-        if len(treatments) == 1 and treatments[0] in start_constants.treatments:
+        # check if both players have the same treatment and each treatmnt in matcher_constants.treatment
+        if len(treatments) == 1 and treatments[0] in matcher_constants.treatments:
             self.treatment = treatments[0]
         for p in self.get_players():
             p.participant.vars['partner_polq'] = p.get_partner().participant.vars.get('own_polq', {})
@@ -165,9 +165,9 @@ class Player(BasePlayer):
         v = self.participant.vars
         if 'start' not in self.session.config.get('app_sequence'):
             index = (self.id_in_subsession - 1) // 2
-            treatment = start_constants.treatments[index % 2]
+            treatment = matcher_constants.treatments[index % 2]
             self.participant.vars['treatment'] = treatment
-            qs = [q['name'] for q in start_constants.polq_data if q['treatment'] == treatment]
+            qs = [q['name'] for q in matcher_constants.polq_data if q['treatment'] == treatment]
             print(f'qs: {qs}')
             _qs = qs.copy()
             random.shuffle(_qs)

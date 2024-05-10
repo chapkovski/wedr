@@ -3,7 +3,7 @@ import random
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
 from .models import Constants, encode_word_with_alphabet
-from start.models import Constants as start_constants
+from matcher.models import Constants as matcher_constants
 import logging
 import json
 from datetime import timedelta, datetime, timezone
@@ -95,7 +95,7 @@ class IntroGuess(Page):
         return self.round_number == 1
     def vars_for_template(self):
         qs_order = self.participant.vars.get('qs', [])
-        qs = [next(q for q in start_constants.polq_data if q['name'] == name) for name in qs_order]
+        qs = [next(q for q in matcher_constants.polq_data if q['name'] == name) for name in qs_order]
         return dict(statements=qs)
 
 page_sequence = [
