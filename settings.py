@@ -43,7 +43,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     prolific_return_url=f"https://app.prolific.com/submissions/complete?cc={PROLIFIC_RETURN_CODE}",
     for_prolific=True,
     real_world_currency_per_point=1.00, participation_fee=0.00, doc="",
-    time_for_work=5 * 600,
+    time_for_work=1 * 60,
     default_treatment='',
     min_to_wait=7,
     payment_for_guess=1.00,

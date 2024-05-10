@@ -119,6 +119,11 @@ class Group(BaseGroup):
         if len(treatments) == 1 and treatments[0] in start_constants.treatments:
             self.treatment = treatments[0]
 
+    def set_time_over(self):
+        default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
+        for p in self.get_players():
+            p.participant.vars['time_to_go'] = default_time.timestamp()
+
     def get_messages(self):
         return (Message.objects.
                 filter(owner_group=self.id_in_subsession,
@@ -126,6 +131,8 @@ class Group(BaseGroup):
                 order_by('utc_time'))
 
     def set_up_game(self):
+        if self.round_number == 1:
+            self.set_time_over()
         g = self
         # we need to encode the word and split the alphabet between the two players
         g.decoded_word = Constants.words[self.round_number - 1]  # choices(Constants.words)[0]
@@ -181,8 +188,6 @@ class Player(BasePlayer):
         )
         return {'type': 'message', 'who': self.participant.code, 'message': data['message']}
 
-
-
     def handle_answer(self, data):
         logger.info('Got answer')
         self.completion_time = data['completedAt']
@@ -213,13 +218,11 @@ class Player(BasePlayer):
         elif type == 'answer':
             data = player.handle_answer(data)
             return {i.id_in_group: {**data, 'player_completed': i.completed} for i in player.group.get_players()}
+
     @property
     def remaining_time(self):
         time_to_go = self.participant.vars.get('time_to_go')
         return time_to_go - datetime.now(timezone.utc).timestamp()
-
-
-
 
 
 class Message(djmodels.Model):
@@ -228,5 +231,3 @@ class Message(djmodels.Model):
     owner = djmodels.ForeignKey(to=Participant, on_delete=djmodels.CASCADE, related_name='messages')
     owner_group = models.IntegerField()
     message = models.StringField()
-
-
