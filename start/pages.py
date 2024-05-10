@@ -35,7 +35,7 @@ class Consent(Page):
 
 
 class Intro(Page):
-    timeout_seconds = 10
+    timeout_seconds = 60
     def vars_for_template(self):
         return dict(num_puzzles=wedr_constants.num_rounds)
     def post(self):
