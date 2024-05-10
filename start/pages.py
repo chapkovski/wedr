@@ -139,11 +139,11 @@ class PolPage(Page):
 
 page_sequence = [
     GameSettingWP,
-    # Consent,
-    # Intro,
-    # Instructions1,
-    # Instructions2,
-    # CQPage,
-    # IntroToPol,
+    Consent,
+    Intro,
+    Instructions1,
+    Instructions2,
+    CQPage,
+    IntroToPol,
     PolPage,
 ]
