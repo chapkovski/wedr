@@ -181,15 +181,7 @@ class Player(BasePlayer):
         )
         return {'type': 'message', 'who': self.participant.code, 'message': data['message']}
 
-    def handle_input(self, data):
-        logger.info('Got input')
-        Input.objects.create(
-            utc_time=data['utcTime'],
-            owner=self,
-            input=data['input'],
-            input_index=data['inputIndex'],
-            since_last_input=data['sinceLastInput']
-        )
+
 
     def handle_answer(self, data):
         logger.info('Got answer')
@@ -217,19 +209,17 @@ class Player(BasePlayer):
             resp = player.handle_message(data)
             return {0: resp}
 
-        elif type == 'input':
-            player.handle_input(data)
+
         elif type == 'answer':
             data = player.handle_answer(data)
             return {i.id_in_group: {**data, 'player_completed': i.completed} for i in player.group.get_players()}
+    @property
+    def remaining_time(self):
+        time_to_go = self.participant.vars.get('time_to_go')
+        return time_to_go - datetime.now(timezone.utc).timestamp()
 
 
-class Input(djmodels.Model):
-    utc_time = djmodels.DateTimeField()
-    owner = djmodels.ForeignKey(to=Player, on_delete=djmodels.CASCADE, related_name='inputs')
-    input = models.StringField()
-    input_index = models.IntegerField()
-    since_last_input = models.FloatField()
+
 
 
 class Message(djmodels.Model):
@@ -240,10 +230,3 @@ class Message(djmodels.Model):
     message = models.StringField()
 
 
-def custom_export(players):
-    # we'll need to get for each player all its inputs
-    inputs = Input.objects.all()
-    yield ['session_code', 'participant_code', 'input_index', 'input', 'utc_time', 'since_last_input']
-    for p in players:
-        for i in p.inputs.all():
-            yield [p.session.code, p.participant.code, i.input_index, i.input, i.utc_time, i.since_last_input]
