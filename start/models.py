@@ -93,10 +93,7 @@ class Constants(BaseConstants):
 
 
 class Subsession(BaseSubsession):
-    def group_by_arrival_time_method(self, waiting_players):
-        if len(waiting_players) > 1:
-            return waiting_players[:2]
-
+    pass
 
 class Group(BaseGroup):
     treatment = models.StringField()

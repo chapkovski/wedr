@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 class GameSettingWP(WaitPage):
     template_name = 'wedr/FirstWP.html'
-    group_by_arrival_time = True
     after_all_players_arrive = 'set_treatment'
     @property
     def body_text(self):
