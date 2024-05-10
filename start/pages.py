@@ -1,26 +1,58 @@
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
-from .models import Constants, make_guess_survey
+from .models import Constants
 import json
 from json import JSONDecodeError
 from pprint import pprint
 from wedr.models import Constants as wedr_constants
 import logging
+from datetime import timedelta, datetime, timezone
+from pprint import pprint
 
 logger = logging.getLogger(__name__)
 from django_user_agents.utils import get_user_agent
 
-
-class FirstWP(WaitPage):
+class GameSettingWP(WaitPage):
+    template_name = 'wedr/FirstWP.html'
     group_by_arrival_time = True
-    body_text = "If your partner does not show up after 5 minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time."
+
+    @property
+    def body_text(self):
+        body_text = f"If you wait for more than {self.min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
+        return body_text
+
+    after_all_players_arrive = 'set_treatment'
+
+    @property
+    def min_to_wait(self):
+        return self.session.config.get('min_to_wait', 5)
 
     def is_displayed(self):
         return self.round_number == 1
 
+    def vars_for_template(self):
+        return dict(no_partner_url=self.session.config.get('no_partner_url'))
+
+    def js_vars(self):
+        # Get the current UTC time
+        current_utc_time = datetime.utcnow()
+
+        # Convert to a format that JavaScript can parse
+        utc_time_string = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+        current_time = self.participant.vars.setdefault('start_waiting_time', utc_time_string)
+        return {'currentTime': current_time, 'minToWait': self.min_to_wait}
+
+
 
 class Consent(Page):
     def get(self, *args, **kwargs):
+        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = self.request.META.get('REMOTE_ADDR')
+        if ip:
+            self.player.ip_address= ip
         user_agent = get_user_agent(self.request)
         logger.info(f'User agent: {user_agent}')
         self.player.full_user_data = json.dumps(user_agent.__dict__)
@@ -66,7 +98,7 @@ class PolPage(Page):
         return self.round_number == 1
 
     def js_vars(self):
-        return dict(json=self.participant.vars['full_q'])
+        return dict(json=self.player.full_q)
 
     def post(self):
         raw_data = self.request.POST.get('survey_data')
@@ -113,38 +145,18 @@ class IntroGuess(Page):
     pass
 
 
-class GuessPage(Page):
-    def js_vars(self):
-        return dict(json=make_guess_survey())
-
-    def post(self):
-        raw_data = self.request.POST.get('survey_data')
-        try:
-            user_responses = json.loads(raw_data)
-            pprint(user_responses)
-            for k, v in user_responses.items():
-                try:
-                    setattr(self.player, k, v)
-                except AttributeError as e:
-                    logger.error(
-                        f'No such field at player level: {k} for value {v}. Player {self.player.participant.code}. Error: {e}')
-        except JSONDecodeError as e:
-            print('*' * 100)
-            print(str(e))
-            print('No data')
-        print('*' * 100)
-        return super().post()
 
 
 page_sequence = [
-    Consent,
-    Intro,
-    Instructions1,
-    Instructions2,
-    CQPage,
-    IntroToPol,
+    GameSettingWP,
+    # Consent,
+    # Intro,
+    # Instructions1,
+    # Instructions2,
+    # CQPage,
+    # IntroToPol,
     PolPage,
     IntroGuess,
-    GuessPage,
+
 
 ]

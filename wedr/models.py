@@ -9,6 +9,7 @@ from otree.api import (
     currency_range,
 )
 from datetime import timedelta, datetime, timezone
+from otree.models import Participant
 from django.db import models as djmodels
 from django.db.models import Count
 from random import choices, sample
@@ -20,6 +21,7 @@ from collections import OrderedDict
 # let's import cycle
 from pprint import pprint
 from os import environ
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,30 +32,6 @@ logger = logging.getLogger(__name__)
 # TODO:
 
 # 4. popup confirming success when the word is submitted correctly
-
-def has_disagreement(dict1, dict2):
-    """
-    Check if there is any disagreement between two dictionaries.
-    Disagreement exists if for any key, the values in both dictionaries are different.
-
-    :param dict1: First dictionary of responses.
-    :param dict2: Second dictionary of responses.
-    :return: True if there is any disagreement, False otherwise.
-    """
-    return any(dict1.get(k) != dict2.get(k) for k in dict1 if k in dict2)
-
-
-def has_agreement(dict1, dict2):
-    """
-    Check if there is any agreement between two dictionaries.
-    Agreement exists if for any key, the values in both dictionaries are the same.
-
-    :param dict1: First dictionary of responses.
-    :param dict2: Second dictionary of responses.
-    :return: True if there is any agreement, False otherwise.
-    """
-    return any(dict1.get(k) == dict2.get(k) for k in dict1 if k in dict2)
-
 
 def split_alphabet_for_decoding(decoded_word, alphabet_to_emoji, n=10):
     # Remove duplicates and convert the decoded word to a set for efficient lookups
@@ -125,30 +103,9 @@ class Constants(BaseConstants):
     num_rounds = int(environ.get('NUM_WORDS', 5))
     seconds_on_page = 20  # how much time they should stay at the page with info about the partner
     assert len(words) >= num_rounds, 'Not enough words in the file for this number of rounds'
-    POLARIZING_TREATMENT = 'polarizing'
-    NEUTRAL_TREATMENT = 'neutral'
-    treatments = [POLARIZING_TREATMENT, NEUTRAL_TREATMENT]
-    treatment_keys = ['polar_disagree_info', 'polar_disagree_noinfo']
-    treatment_options = {
-        'polar_disagree_info': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
-        'polar_disagree_noinfo': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': False},
-        # 'polar_disagree_details': {'treatment': POLARIZING_TREATMENT, 'agree': False, 'info': True},
-        # 'polar_agree_info': {'treatment': POLARIZING_TREATMENT, 'agree': True, 'info': True},
-        # 'neutral_disagree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': False, 'info': True},
-        # 'neutral_agree_info': {'treatment': NEUTRAL_TREATMENT, 'agree': True, 'info': True}
-    }
-    with open('data/polquestions.csv', 'r') as f:
-        statements = list(csv.DictReader(f))
-
 
 class Subsession(BaseSubsession):
-
-    def creating_session(self):
-        default_treatment = self.session.config.get('default_treatment')
-        if default_treatment != '':
-            assert self.session.config.get(
-                'default_treatment') in Constants.treatment_options.keys(), 'Invalid default treatment'
-
+    pass
 
 class Group(BaseGroup):
     treatment_key = models.StringField()
@@ -157,104 +114,8 @@ class Group(BaseGroup):
     show_disagreement = models.BooleanField()
     show_details = models.BooleanField()
 
-    def check_agreement_availability(self, p1, p2):
-        """
-        Check the availability of agreement and disagreement for polarizing and neutral sets.
-
-        Args:
-        p1, p2: Participant objects, each containing 'polarizing_set' and 'neutral_set'.
-
-        Returns:
-        Dictionary with the availability of agreement and disagreement for polarizing and neutral question sets.
-        """
-        # Polarizing set agreement and disagreement
-        polar_agree = has_agreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
-        polar_disagree = has_disagreement(p1.vars['polarizing_set'], p2.vars['polarizing_set'])
-
-        # Neutral set agreement and disagreement
-        neutral_agree = has_agreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
-        neutral_disagree = has_disagreement(p1.vars['neutral_set'], p2.vars['neutral_set'])
-
-        # Compile the availability into a dictionary
-        availability_dict = {
-            'polarizing': {'agree': polar_agree, 'disagree': polar_disagree},
-            'neutral': {'agree': neutral_agree, 'disagree': neutral_disagree}
-        }
-
-        return availability_dict
-
-    def filter_feasible_treatments(self):
-        # Get participant objects
-        p1 = self.get_player_by_id(1).participant
-        p2 = self.get_player_by_id(2).participant
-
-        # Check agreement availability
-        availability = self.check_agreement_availability(p1, p2)
-        print(f'{availability=}')
-
-        # Define possible treatments and their feasibility requirements
-        treatment_requirements = Constants.treatment_options
-
-        treatment_counts_dict = {key: 0 for key in treatment_requirements.keys()}
-        treatment_counts_query = (self.subsession.group_set
-                                  .values('treatment_key')
-                                  .annotate(count=Count('id')))
-        treatment_counts_dict.update({item['treatment_key']: item['count'] for item in treatment_counts_query})
-
-        # Prepare a dictionary to store feasible treatments
-        feasible_treatment_counts = {}
-
-        # Evaluate each treatment option for feasibility
-        for treatment_key, requirements in treatment_requirements.items():
-            treatment_type = requirements['treatment']
-            required_agreement = requirements['agree']
-
-            # Adjust feasibility check based on whether agreement or disagreement is required
-            is_feasible = (
-                availability[treatment_type]['agree'] if required_agreement else availability[treatment_type][
-                    'disagree'])
-
-            if is_feasible:
-                feasible_treatment_counts[treatment_key] = treatment_counts_dict[treatment_key]
-
-        return feasible_treatment_counts
-
-    def choose_treatment(self):
-        return Constants.treatment_keys[self.id_in_subsession % 2]
-        feasible_treatment_counts = self.filter_feasible_treatments()
-        # if it is not available let's replace it by {'polar_disagree_info': 0, 'polar_disagree_noinfo': 0}
-        if not feasible_treatment_counts:
-            feasible_treatment_counts = {'polar_disagree_info': 0, 'polar_disagree_noinfo': 0}
-
-        # Find the minimum count among the feasible treatments
-        min_count = min(feasible_treatment_counts.values())
-
-        # Collect all treatment keys that have the minimum count
-        least_popular_treatments = [key for key, count in feasible_treatment_counts.items() if count == min_count]
-
-        # Randomly choose one from the least popular treatments
-        if least_popular_treatments:
-            chosen_treatment_key = random.choice(least_popular_treatments)
-            print(f"Chosen treatment: {chosen_treatment_key}")
-            return chosen_treatment_key
-        else:
-            print("No feasible treatment found")
-            return None
-
-    def set_treatment(self):
-        if self.session.config.get('default_treatment') == '':
-            treatment_key = self.choose_treatment()
-            if treatment_key:
-                self.treatment_key = treatment_key
-            else:
-                raise Exception("No feasible treatment found")
-        else:
-            treatment_key = self.session.config.get('default_treatment')
-            self.treatment_key = treatment_key
-        self.treatment = Constants.treatment_options[treatment_key]['treatment']
-        self.agreement = Constants.treatment_options[treatment_key]['agree']
-        self.show_disagreement = Constants.treatment_options[treatment_key]['info']
-        self.show_details = self.treatment_key == 'polar_disagree_details'
+    def get_messages(self):
+        return Message.objects.filter(owner_group=self.id_in_subsession).order_by('utc_time')
 
     def set_up_game(self):
         g = self
@@ -327,8 +188,8 @@ class Player(BasePlayer):
         logger.info('Got message', data)
         Message.objects.create(
             utc_time=data['utcTime'],
-            owner=self,
-            owner_group=self.group,
+            owner=self.participant,
+            owner_group=self.group.id_in_subsession,
             message=data['message'],
         )
         return {'type': 'message', 'who': self.participant.code, 'message': data['message']}
@@ -387,8 +248,8 @@ class Input(djmodels.Model):
 class Message(djmodels.Model):
     meta = {'ordering': ['utc_time']}  # this is needed to get the messages in the right order
     utc_time = djmodels.DateTimeField()
-    owner = djmodels.ForeignKey(to=Player, on_delete=djmodels.CASCADE, related_name='messages')
-    owner_group = djmodels.ForeignKey(to=Group, on_delete=djmodels.CASCADE, related_name='messages')
+    owner = djmodels.ForeignKey(to=Participant, on_delete=djmodels.CASCADE, related_name='messages')
+    owner_group = models.IntegerField()
     message = models.StringField()
 
 

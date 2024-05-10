@@ -87,60 +87,46 @@ class Constants(BaseConstants):
         yaml_template = yaml_file.read()
         rendered_yaml = Template(yaml_template).render({})
         survey_prototype = yaml.safe_load(rendered_yaml)
-
-
-def create_statement_page(statement):
-    return {
-        "name": f"{statement['name']}_page",
-        "elements": [
-            {
-                "type": "html",
-                "name": statement["name"],
-                "html": f"<div class='lead text-center display-3' style='font-size:1.2rem'><i>{statement['text']}</i></div>"
-            },
-            {
-                "type": "radiogroup",
-                "name": f"{statement['name']}_guess",
-                "title": "Please consider the statement above and indicate your guess by choosing one of the following options:",
-                "choices": [
-                    {'value': 0, 'text': "My partner has a similar opinion (similar answers to mine)"},
-                    {'value': 1, 'text': "My partner has an opposite opinion (opposite answers to mine)"},
-
-                ]
-            }
-        ]
-    }
-
-
-def make_guess_survey():
-    stub = dict(pages=[], showPrevButton=False, completeText="Next", showCompletedPage=False, showProgressBar='auto',
-                progressBarType="questions")
-    polq_data = deepcopy(Constants.polq_data.copy())
-    random.shuffle(polq_data)
-    stub['pages'] = [create_statement_page(statement) for statement in polq_data]
-    return stub
+    POLARIZING_TREATMENT = 'polarizing'
+    NEUTRAL_TREATMENT = 'neutral'
+    treatments = [POLARIZING_TREATMENT, NEUTRAL_TREATMENT]
 
 
 class Subsession(BaseSubsession):
     def group_by_arrival_time_method(self, waiting_players):
-        if len(waiting_players) > 0:
-            return waiting_players[:1]
+        if len(waiting_players) > 1:
+            return waiting_players[:2]
 
 
 class Group(BaseGroup):
-    pass
+    treatment = models.StringField()
+
+    def set_treatment(self):
+        self.treatment = Constants.treatments[self.id_in_subsession % 2]
+        qs = [q['name'] for q in Constants.polq_data if q['treatment'] == self.treatment]
+        print(f'qs: {qs}')
+        for p in self.get_players():
+            _qs = qs.copy()
+            random.shuffle(_qs)
+            p.qs_order = json.dumps(_qs)
+            p.participant.vars['treatment'] = self.treatment
+            p.participant.vars['qs'] = _qs
 
 
 class Player(BasePlayer):
     def start(self):
-        qs = Constants.polq_data.copy()
-        random.shuffle(qs)
-        self.qs_order = json.dumps([q['name'] for q in qs])
+        pass
+
+    @property
+    def full_q(self):
+        qs_order = json.loads(self.qs_order)
+        qs = [next(q for q in Constants.polq_data if q['name'] == name) for name in qs_order]
+
         rendered_questionnaire = load_csv_to_survey_pages(qs, choices=Constants.response_mapping)
         # let's make a deepcopy of the survey_prototype
-        full_q = deepcopy(Constants.survey_prototype)
-        full_q['pages'].extend(rendered_questionnaire)
-        self.participant.vars['full_q'] = full_q
+        res = deepcopy(Constants.survey_prototype)
+        res['pages'].extend(rendered_questionnaire)
+        return res
 
     consent_accept = models.BooleanField(
         label="""
@@ -148,19 +134,7 @@ class Player(BasePlayer):
                     consent I am not giving up any of my legal rights.""",
         widget=widgets.CheckboxInput
     )
-    #     guessing block
-    books_guess = models.IntegerField()
-    cars_guess = models.IntegerField()
-    cities_guess = models.IntegerField()
-    immigration_guess = models.IntegerField()
-    partisanship_guess = models.IntegerField()
-    women_guess = models.IntegerField()
 
-    full_neutral_set = models.StringField()
-    full_polarizing_set = models.StringField()
-    neutral_set = models.StringField()
-    polarizing_set = models.StringField()
-    survey_data = models.LongStringField()
     qs_order = models.StringField()
     # user agent block
     full_user_data = models.LongStringField()
@@ -169,15 +143,20 @@ class Player(BasePlayer):
     useragent_browser_family = models.StringField()
     useragent_os_family = models.StringField()
     useragent_device_family = models.StringField()
+    ip_address = models.StringField()
     # political demographic quetionsnnaire fields: ['age', 'gender', 'maritalStatus', 'employmentStatus', 'householdIncome', 'women', 'partisanship', 'immigration', 'books', 'cities', 'cars']
     age = models.StringField()
     gender = models.StringField()
     maritalStatus = models.StringField()
     employmentStatus = models.StringField()
     householdIncome = models.StringField()
+    # polarizing
     women = models.StringField()
     partisanship = models.StringField()
     immigration = models.StringField()
+    climate_change = models.StringField()
+    # neutral
     books = models.StringField()
     cities = models.StringField()
     cars = models.StringField()
+    healthy_eating = models.StringField()
