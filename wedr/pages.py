@@ -3,22 +3,25 @@ import random
 from otree.api import Currency as c, currency_range
 from ._builtin import Page, WaitPage
 from .models import Constants, encode_word_with_alphabet
-from matcher.models import Constants as matcher_constants
 import logging
 import json
 from datetime import timedelta, datetime, timezone
 from pprint import pprint
+from json import JSONDecodeError
 
 logger = logging.getLogger(__name__)
 
 
 class GameSettingWP(WaitPage):
     template_name = 'wedr/FirstWP.html'
-    after_all_players_arrive = 'set_treatment'
+    group_by_arrival_time = True
+
     @property
     def body_text(self):
         body_text = f"If you wait for more than {self.min_to_wait} minutes, please submit NO_PARTNER code in Prolific and we will compensate you for your time! Thank you!"
         return body_text
+
+    after_all_players_arrive = 'set_treatment'
 
     @property
     def min_to_wait(self):
@@ -36,8 +39,57 @@ class GameSettingWP(WaitPage):
 
         # Convert to a format that JavaScript can parse
         utc_time_string = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-        current_time = self.participant.vars.setdefault('start_waiting_time2', utc_time_string)
+        current_time = self.participant.vars.setdefault('start_waiting_time1', utc_time_string)
         return {'currentTime': current_time, 'minToWait': self.min_to_wait}
+
+
+class IntroToPol(Page):
+    def is_displayed(self):
+        return self.round_number == 1
+
+
+class PolPage(Page):
+    def is_displayed(self):
+        return self.round_number == 1
+
+    def js_vars(self):
+        return dict(json=self.player.full_q)
+
+    def post(self):
+        raw_data = self.request.POST.get('survey_data')
+        try:
+
+            json_data = json.loads(raw_data)
+            data = Constants.polq_data.copy()
+            response_mapping = Constants.response_mapping.copy()
+            user_responses = json_data
+            pprint(user_responses)
+            res = {}
+            for k, v in user_responses.items():
+                try:
+                    setattr(self.player, k, str(v))
+                except AttributeError as e:
+                    logger.error(
+                        f'No such field at player level: {k} for value {v}. Player {self.player.participant.code}. Error: {e}')
+            for item in data:
+                name = item['name']
+                if name in user_responses:
+                    res[name] = dict(
+                        response_value=user_responses[name],
+                        response_text=response_mapping[user_responses[name]],
+                        text=item['text'],
+                    )
+
+            self.participant.vars['polq_data'] = res
+            self.participant.vars['own_polq'] = user_responses
+
+
+        except JSONDecodeError as e:
+            print('*' * 100)
+            print(str(e))
+            print('No data')
+        print('*' * 100)
+        return super().post()
 
 
 class WorkingPage(Page):
@@ -88,6 +140,7 @@ class WorkingPage(Page):
 
 class PartnerWP(WaitPage):
     after_all_players_arrive = 'set_up_game'
+
     def is_displayed(self):
         if self.round_number == 1:
             return True
@@ -96,16 +149,21 @@ class PartnerWP(WaitPage):
             return False
         return True
 
+
 class IntroGuess(Page):
     def is_displayed(self):
         return self.round_number == 1
+
     def vars_for_template(self):
         qs_order = self.participant.vars.get('qs', [])
-        qs = [next(q for q in matcher_constants.polq_data if q['name'] == name) for name in qs_order]
+        qs = [next(q for q in Constants.polq_data if q['name'] == name) for name in qs_order]
         return dict(statements=qs)
+
 
 page_sequence = [
     GameSettingWP,
+    IntroToPol,
+    PolPage,
     # IntroGuess,
     PartnerWP,
     WorkingPage,
