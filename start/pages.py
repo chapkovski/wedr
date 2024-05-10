@@ -15,13 +15,7 @@ from django_user_agents.utils import get_user_agent
 
 class Consent(Page):
     def get(self, *args, **kwargs):
-        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = self.request.META.get('REMOTE_ADDR')
-        if ip:
-            self.player.ip_address = ip
+
         user_agent = get_user_agent(self.request)
         logger.info(f'User agent: {user_agent}')
         self.player.full_user_data = json.dumps(user_agent.__dict__)

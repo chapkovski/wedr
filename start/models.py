@@ -47,4 +47,4 @@ class Player(BasePlayer):
     useragent_browser_family = models.StringField()
     useragent_os_family = models.StringField()
     useragent_device_family = models.StringField()
-    ip_address = models.StringField()
+
