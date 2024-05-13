@@ -48,7 +48,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     time_for_work=7 * 60,
     default_treatment='',
     min_to_wait=7,
-    payment_for_guess=1.00,
+    payment_for_guess=2,
 )
 
 # ISO-639 code
@@ -56,8 +56,9 @@ SESSION_CONFIG_DEFAULTS = dict(
 LANGUAGE_CODE = 'en'
 
 # e.g. EUR, GBP, CNY, JPY
-REAL_WORLD_CURRENCY_CODE = 'USD'
-USE_POINTS = True
+REAL_WORLD_CURRENCY_CODE = 'GBP'
+USE_POINTS = False
+REAL_WORLD_CURRENCY_DECIMAL_PLACES = 2
 
 ADMIN_USERNAME = 'admin'
 # for security, best to set admin password in an environment variable

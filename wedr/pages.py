@@ -63,7 +63,6 @@ class PolPage(Page):
             data = Constants.polq_data.copy()
             response_mapping = Constants.response_mapping.copy()
             user_responses = json_data
-            pprint(user_responses)
             res = {}
             for k, v in user_responses.items():
                 try:
@@ -163,8 +162,9 @@ class IntroGuess(Page):
 page_sequence = [
     GameSettingWP,
     # IntroToPol,
-    # PolPage,
+    PolPage,
     IntroGuess,
     PartnerWP,
     WorkingPage,
+
 ]

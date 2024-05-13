@@ -1,0 +1,60 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="alert alert-{{ view.alert.color }}">
+    {%  autoescape off %}
+        {{ view.alert.text }}
+    {%  endautoescape %}
+    </div>
+
+    <style>
+        .otree-body {
+            max-width: 100%;
+        }
+    </style>
+    <script>
+        window.json = {
+            "title": "Indicate your partner's answers",
+            "pages": [
+                {
+                    "name": "page1",
+                    "elements": [
+                        {
+                            "type": "matrix",
+                            "name": "partner_answers",
+                            "title": "Please indicate your partner's positions on the following statements",
+                            "alternateRows": true,
+                            "isRequired": true,
+                            "rowsOrder": "random",
+                            "isAllRowRequired": true,
+                            "columns": js_vars.columns,
+                            "rows": js_vars.rows,
+                        }
+                    ]
+                }
+            ]
+        }
+
+    </script>
+
+    <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/survey-jquery/1.10.2/survey.jquery.min.js"
+            integrity="sha512-by0UtPaZIVW4faiqEE/cF3cSNhdGCDgliGE8gluMCu+ij3RJXutFREJE9YXuUfDqqVAge+8uqP9KAd1zZjMDog=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/survey-jquery@1.9.115/themes/index.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/survey-jquery@1.9.115/defaultV2.min.css"/>
+    <input type="hidden" id="survey_data" value="" name="survey_data">
+
+    <div id="surveyElement" style=""></div>
+
+
+
+    <script src="{% static 'wedr/cq_index.js' %}"></script>
+
+
+{% endblock %}

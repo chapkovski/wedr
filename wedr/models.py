@@ -14,7 +14,6 @@ from django.db import models as djmodels
 
 from random import choices, sample
 
-
 import json
 import logging
 from collections import OrderedDict
@@ -182,8 +181,6 @@ class Group(BaseGroup):
             p.participant.vars['treatment'] = self.treatment
             p.participant.vars['qs'] = _qs
 
-
-
     def set_time_over(self):
         default_time = datetime.now(timezone.utc) + timedelta(seconds=self.session.config.get("time_for_work", 1000))
         for p in self.get_players():
@@ -197,6 +194,8 @@ class Group(BaseGroup):
 
     def set_up_game(self):
         if self.round_number == 1:
+            for p in self.get_players():
+                p.participant.vars['partner_polq'] = p.get_partner().participant.vars.get('own_polq')
             self.set_time_over()
         g = self
         # we need to encode the word and split the alphabet between the two players
@@ -248,7 +247,6 @@ class Player(BasePlayer):
             self.participant.vars['qs'] = _qs
         self.qs_order = json.dumps(v.get('qs', []))
 
-
     qs_order = models.StringField()
     own_polq = models.StringField()
     partner_polq = models.StringField()
@@ -257,8 +255,6 @@ class Player(BasePlayer):
     start_time = djmodels.DateTimeField(null=True)
     completion_time = djmodels.DateTimeField(null=True)
     completed = models.BooleanField(default=False)
-
-
 
     # political demographic quetionsnnaire fields: ['age', 'gender', 'maritalStatus', 'employmentStatus', 'householdIncome', 'women', 'partisanship', 'immigration', 'books', 'cities', 'cars']
     age = models.StringField()

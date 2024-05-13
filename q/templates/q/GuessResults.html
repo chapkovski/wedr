@@ -1,0 +1,31 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Results
+{% endblock %}
+
+{% block content %}
+
+    <table class="table table-hover table-stripped">
+    <thead>
+        <tr>
+            <th>Statement</th>
+            <th>Partner Answer</th>
+            <th>Your Guess</th>
+        </tr>
+    </thead>
+        {% for s in combined_results %}
+            <tr>
+                <td>{{ s.text }}</td>
+                <td class="{{ s.color }}">{{ s.partner_answer_text }}</td>
+                <td class="{{ s.color }}">{{ s.current_guess_text }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="my-3 alert alert-info">
+    Additional bonus for this part is: <b> {{ player.payoff }}</b>
+    </div>
+    {% next_button %}
+
+{% endblock %}
