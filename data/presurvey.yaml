@@ -50,18 +50,6 @@ pages:
           - Professional degree (e.g., MD, JD)
           - Doctorate (e.g., PhD, EdD)
           - Prefer not to answer
-  - name: page_maritalStatus
-    elements:
-      - type: radiogroup
-        name: maritalStatus
-        title: What is your marital status?
-        isRequired: true
-        choices:
-          - Single (never married)
-          - Married, or in a domestic partnership
-          - Widowed
-          - Divorced
-          - Separated
   - name: page_employmentStatus
     elements:
       - type: radiogroup

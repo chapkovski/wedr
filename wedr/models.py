@@ -277,7 +277,7 @@ A, B, and C"""
 
     age = models.StringField()
     gender = models.StringField()
-
+    education = models.StringField()
     employmentStatus = models.StringField()
     householdIncome = models.StringField()
     # polarizing

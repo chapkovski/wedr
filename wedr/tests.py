@@ -24,8 +24,7 @@ def generate_random_response():
                             "$25,000 - $50,000", "$50,000 - $75,000", "$75,000 - $100,000", "$100,000 - $150,000",
                             "More than $150,000", "Prefer not to answer"],
         'immigration': list(range(0, 6)),  # Assuming scale 0-5
-        'maritalStatus': ["Single (never married)", "Married, or in a domestic partnership", "Widowed", "Divorced",
-                          "Separated"],
+        'education': ["Less than high school", "High school graduate", "Some college", "Bachelor's degree", ],
 
         'women': list(range(0, 6)),  # Assuming scale 0-5,
         'books': list(range(0, 6)),
