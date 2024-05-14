@@ -48,7 +48,7 @@ SESSION_CONFIG_DEFAULTS = dict(
     time_for_work=7 * 60,
     default_treatment='',
     min_to_wait=7,
-    payment_for_guess=2,
+    payment_for_guess=1.5,
 )
 
 # ISO-639 code

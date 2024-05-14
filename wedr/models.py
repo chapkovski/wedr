@@ -11,10 +11,10 @@ from otree.api import (
 from datetime import timedelta, datetime, timezone
 from otree.models import Participant
 from django.db import models as djmodels
-
+import csv
+import unicodedata
 from random import choices, sample
 
-import json
 import logging
 from collections import OrderedDict
 
@@ -101,24 +101,37 @@ def split_alphabet_for_decoding(decoded_word, alphabet_to_emoji, n=10):
     return json.dumps(first_participant_dict), json.dumps(second_participant_dict)
 
 
+
+def normalize_emoji(emoji):
+    return unicodedata.normalize('NFC', emoji)
+
+
 def encode_word_with_alphabet(word):
-    # List of example emojis categorized under 'People & Body' for demonstration
-    # all_emojis = emojis.db.utils.db.EMOJI_DB
-    # let's read emojis from 'data/emojis.txt
-    with open('data/emojis.txt', 'r') as f:
-        allowed_emojis = f.readlines()
-        allowed_emojis = list(set([i.strip() for i in allowed_emojis]))
+    # Read the pre-generated emoji encodings from the CSV file
+    df = pd.read_csv('data/word_emojis.csv', encoding='utf-8')
 
-    # Create a mapping between alphabets and a random set of emojis
-    alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    selected_emojis = random.sample(allowed_emojis, len(alphabet))
-    alphabet_to_emoji = dict(zip(alphabet, selected_emojis))
+    # Set the word column as the index
+    df.set_index('word', inplace=True)
 
-    # Encode the word
-    encoded_word = [alphabet_to_emoji.get(letter) for letter in word]
-    return {'encoded_word': encoded_word, 'alphabet_to_emoji': alphabet_to_emoji}
+    # Check if the word exists in the DataFrame
+    if word in df.index:
+        row = df.loc[word]
+        encoded_word = list(row['encoded_word'])
+        alphabet_to_emoji = {k: normalize_emoji(v) for k, v in
+                             (item.split(":") for item in row['alphabet_to_emoji'].split(";"))}
 
-
+        return {
+            'encoded_word': encoded_word,
+            'alphabet_to_emoji': alphabet_to_emoji
+        }
+    else:
+        raise ValueError(f"No encoding found for word: {word}")
+# Test the function
+test_word = 'love'
+result = encode_word_with_alphabet(test_word)
+print(f"Word to decode: {test_word}")
+print(f"Encoded word: {result['encoded_word']}")
+print(f"Alphabet to emoji: {result['alphabet_to_emoji']}")
 author = 'Philipp Chapkovski, UBonn, chapkovski@gmail.com'
 
 doc = """
@@ -205,6 +218,9 @@ class Group(BaseGroup):
         res = encode_word_with_alphabet(g.decoded_word)
         g.alphabet_to_emoji = json.dumps(res['alphabet_to_emoji'])
         g.encoded_word = json.dumps(res['encoded_word'])
+        print(f'len of encoded word: {len(res["encoded_word"])}')
+        print(f'word to decode: {g.decoded_word}')
+        print(f'encoded word: {res["encoded_word"]}')
         p1 = g.get_player_by_id(1)
         p2 = g.get_player_by_id(2)
         p1.partial_dict, p2.partial_dict = split_alphabet_for_decoding(g.decoded_word, res['alphabet_to_emoji'])
@@ -235,35 +251,28 @@ class Player(BasePlayer):
         return self.get_others_in_group()[0]
 
     def start(self):
-
-        # TODO FOR TESTING ONLY, NB::   REMOVE THIS LATER
         v = self.participant.vars
-        if 'start' not in self.session.config.get('app_sequence'):
-            index = (self.id_in_subsession - 1) // 2
-            treatment = Constants.treatments[index % 2]
-            self.participant.vars['treatment'] = treatment
-            qs = [q['name'] for q in Constants.polq_data if q['treatment'] == treatment]
-            print(f'qs: {qs}')
-            _qs = qs.copy()
-            random.shuffle(_qs)
-            self.participant.vars['qs'] = _qs
+        # if 'start' not in self.session.config.get('app_sequence'):
+        #     index = (self.id_in_subsession - 1) // 2
+        #     treatment = Constants.treatments[index % 2]
+        #     self.participant.vars['treatment'] = treatment
+        #     qs = [q['name'] for q in Constants.polq_data if q['treatment'] == treatment]
+        #     print(f'qs: {qs}')
+        #     _qs = qs.copy()
+        #     random.shuffle(_qs)
+        #     self.participant.vars['qs'] = _qs
         self.qs_order = json.dumps(v.get('qs', []))
 
-    """
-    Choices:
-
-Only A
-Only B
-Only C
-A and B
-A, B, and C"""
+    guess_error_counter = models.IntegerField(initial=0)
     guess_check = models.StringField(
         choices=['Only A', 'Only B', 'Only C', 'A and B', 'A, B, and C'],
         widget=widgets.RadioSelect
     )
 
     def guess_check_error_message(self, value):
+
         if value != 'A, B, and C':
+            self.guess_error_counter += 1
             return 'Please check your answer'
 
     qs_order = models.StringField()

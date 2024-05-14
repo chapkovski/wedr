@@ -37,15 +37,15 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     def start(self):
-        if 'wedr' not in self.session.config.get('app_sequence'):
-            self.participant.vars['treatment'] = random.choice(wedr_constants.treatments)
-            treatment = self.participant.vars['treatment']
-            self.participant.vars['own_polq'] = {i.get('name'): random.randint(0, 5) for i in wedr_constants.polq_data
-                                                 }
-            print(self.participant.vars['own_polq'])
-            self.participant.vars['partner_polq'] = {i.get('name'): random.randint(0, 5) for i in
-                                                     wedr_constants.polq_data}
-            print(self.participant.vars['partner_polq'])
+        # if 'wedr' not in self.session.config.get('app_sequence'):
+        #     self.participant.vars['treatment'] = random.choice(wedr_constants.treatments)
+        #     treatment = self.participant.vars['treatment']
+        #     self.participant.vars['own_polq'] = {i.get('name'): random.randint(0, 5) for i in wedr_constants.polq_data
+        #                                          }
+        #     print(self.participant.vars['own_polq'])
+        #     self.participant.vars['partner_polq'] = {i.get('name'): random.randint(0, 5) for i in
+        #                                              wedr_constants.polq_data}
+        #     print(self.participant.vars['partner_polq'])
         self.treatment = self.participant.vars.get('treatment')
         self.own_polq = json.dumps(self.participant.vars.get('own_polq'))
         self.partner_polq = json.dumps(self.participant.vars.get('partner_polq'))
@@ -89,7 +89,6 @@ class Player(BasePlayer):
     )
 
     interest_in_us_politics = models.StringField()
-    opinion_impact = models.StringField()
     partner_effort = models.StringField()
     political_discussion_at_work = models.StringField()
     political_orientation = models.StringField()
