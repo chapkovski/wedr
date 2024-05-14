@@ -10,9 +10,11 @@
 
 {% block content %}
     {% include 'wedr/includes/guess_instructions.html' %}
-
+    <div class="alert alert-danger lead text-center">
+        These instructions will be available to you during the task.
+    </div>
     <div class="card my-3 elevation-3">
-     <div class="card-header  font-weight-bold">Choose the correct answer:</div>
+        <div class="card-header  font-weight-bold">Choose the correct answer:</div>
         <div class="card-body">
 
             <div class="card-text">
@@ -26,11 +28,12 @@
                     <li> C) Have your answers match your partner's answers.</li>
                 </ul>
                 <div>
-                    {%  formfield  player.guess_check label='' %}
+                    {% formfield player.guess_check label='' %}
                 </div>
             </div>
         </div>
     </div>
+
     {% next_button %}
 
 {% endblock %}
