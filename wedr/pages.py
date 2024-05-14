@@ -100,7 +100,11 @@ class WorkingPage(Page):
         return not self.group.completed
 
     def vars_for_template(self):
-        qs = [q for q in Constants.polq_data if q.get('treatment') == self.group.treatment]
+        if self.round_number == 1:
+            treatment = self.group.treatment
+        else:
+            treatment = self.group.in_round(1).treatment
+        qs = [q for q in Constants.polq_data if q.get('treatment') == treatment]
         return dict(show_warning=True, num_puzzles=Constants.num_rounds, statements=qs)
 
     def js_vars(self):
