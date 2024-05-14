@@ -172,7 +172,7 @@ class Group(BaseGroup):
 
     def set_treatment(self):
         self.treatment = Constants.treatments[self.id_in_subsession % 2]
-        qs = [q['name'] for q in Constants.polq_data if q['treatment'] == self.treatment]
+        qs = [q['name'] for q in Constants.polq_data ]
         print(f'qs: {qs}')
         for p in self.get_players():
             _qs = qs.copy()
@@ -246,6 +246,21 @@ class Player(BasePlayer):
             random.shuffle(_qs)
             self.participant.vars['qs'] = _qs
         self.qs_order = json.dumps(v.get('qs', []))
+    """
+    Choices:
+
+Only A
+Only B
+Only C
+A and B
+A, B, and C"""
+    guess_check= models.StringField(
+        choices=['Only A', 'Only B', 'Only C', 'A and B', 'A, B, and C'],
+        widget=widgets.RadioSelect
+    )
+    def guess_check_error_message(self, value):
+        if value!='A, B, and C':
+            return 'Please check your answer'
 
     qs_order = models.StringField()
     own_polq = models.StringField()

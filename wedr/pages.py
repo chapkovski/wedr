@@ -100,7 +100,8 @@ class WorkingPage(Page):
         return not self.group.completed
 
     def vars_for_template(self):
-        return dict(show_warning=True, num_puzzles=Constants.num_rounds)
+        qs = [q for q in Constants.polq_data if q.get('treatment') == self.group.treatment]
+        return dict(show_warning=True, num_puzzles=Constants.num_rounds, statements=qs)
 
     def js_vars(self):
         main_dict = dict(
@@ -150,18 +151,20 @@ class PartnerWP(WaitPage):
 
 
 class IntroGuess(Page):
+    form_model = 'player'
+    form_fields = ['guess_check']
     def is_displayed(self):
         return self.round_number == 1
 
     def vars_for_template(self):
-        qs_order = self.participant.vars.get('qs', [])
-        qs = [next(q for q in Constants.polq_data if q['name'] == name) for name in qs_order]
+
+        qs = [q for q in Constants.polq_data if q.get('treatment') == self.group.treatment]
         return dict(statements=qs)
 
 
 page_sequence = [
     GameSettingWP,
-    # IntroToPol,
+    IntroToPol,
     PolPage,
     IntroGuess,
     PartnerWP,

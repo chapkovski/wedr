@@ -1,0 +1,32 @@
+ <div class="card my-3 ">
+        <div class="card-body">
+            <div class="card-text">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        There is a possibility to earn <b>an additional bonus</b> in this study.
+                    </li>
+                    <li class="list-group-item">
+
+
+                        You can earn a bonus in this study. To qualify, ask your partner what answers they gave to the
+                        same statements that you answered. After you have completed the tasks, indicate your partner's
+                        opinion and we will compare your
+                        answers with your partner's responses.
+                    </li>
+                    <li class="list-group-item lead text-center">
+                        Here are the statements:
+                    </li>
+                    {% for s in statements %}
+                        <li class="list-group-item font-italic lead text-center">
+                            {{ s.text }}
+                        </li>
+                    {% endfor %}
+                    <li class="list-group-item">
+                        If your answers match your partner's answers, you will receive <b>a bonus of £{{ session.config.payment_for_guess }}</b>.
+
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>

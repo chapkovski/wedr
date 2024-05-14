@@ -9,34 +9,25 @@
 
 
 {% block content %}
-    <div class="card my-3 ">
+    {% include 'wedr/includes/guess_instructions.html' %}
+
+    <div class="card my-3 elevation-3">
+     <div class="card-header  font-weight-bold">Choose the correct answer:</div>
         <div class="card-body">
+
             <div class="card-text">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        There is a possibility to earn an additional bonus in this study.
-                    </li>
-                    <li class="list-group-item">
 
-
-                        You can earn a bonus in this study. To qualify, ask your partner what answers they gave on the
-                        same statements you also answered. After completing the tasks, you will indicate your partner's
-                        opinions using the same scale, from 'strongly disagree' to 'strongly agree.'
-                    </li>
-                    <li class="list-group-item lead text-center">
-                        Here are the statements:
-                    </li>
-                    {% for s in statements %}
-                        <li class="list-group-item font-italic lead text-center">
-                            {{ s.text }}
-                        </li>
-                    {% endfor %}
-                    <li class="list-group-item">
-                        If your answers match your partner's responses, you will earn a bonus of £{{ session.config.payment_for_guess }}.
-
-                    </li>
-
+                <p>
+                    To qualify for the additional bonus in this study, you must:
+                </p>
+                <ul>
+                    <li>A) Ask your partner what answers they gave to the statements listed above.</li>
+                    <li>B) Complete the tasks and indicate your partner's opinion.</li>
+                    <li> C) Have your answers match your partner's answers.</li>
                 </ul>
+                <div>
+                    {%  formfield  player.guess_check label='' %}
+                </div>
             </div>
         </div>
     </div>

@@ -47,5 +47,6 @@ class PlayerBot(Bot):
             yield pages.IntroToPol
             raw_data = json.dumps(generate_random_response())
             yield Submission(pages.PolPage, dict(survey_data=raw_data), check_html=False)
+            yield pages.IntroGuess, dict(guess_check='A, B, and C')
 
         yield Submission(pages.WorkingPage, {}, check_html=False)

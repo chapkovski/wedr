@@ -88,6 +88,7 @@ class GuessAnswerPage(_GuessPage):
         return rows
     def before_next_page(self):
         self.player.guess = json.dumps(self.participant.vars.get('current_guess',{}))
+        self.player.results_order = self.player.id_in_group % 2 ==0
         self.player.set_payoffs()
 
 class NonMonGuessAnswerPage(_GuessPage):
@@ -98,9 +99,11 @@ class NonMonGuessAnswerPage(_GuessPage):
         rows = [dict(value=i.get('name'), text=i.get('text')) for i in wedr_constants.polq_data if
                 i.get('treatment') !=self.participant.vars.get('treatment')]
         return rows
-
+    def before_next_page(self):
+        self.player.guess = json.dumps(self.participant.vars.get('current_guess', {}))
 
 class GuessResults(Page):
+    template_name = 'q/GuessResults.html'
     def vars_for_template(self):
         current_guess = json.loads(self.player.guess)
         partner_answers = json.loads(self.player.partner_polq)
@@ -110,10 +113,9 @@ class GuessResults(Page):
         # the partner's answer and the current guess.
         combined_results = []
         polq_data = wedr_constants.polq_data
-        pprint(polq_data)
         for statement in polq_data:
             name = statement.get('name')
-            if name in partner_answers:
+            if name in partner_answers and name in self.player.keys_needed:
                 partner_answer_text = wedr_constants.response_mapping.get(partner_answers.get(name))
                 combined_results.append({
                     'name': name,
@@ -127,12 +129,19 @@ class GuessResults(Page):
 
         # Return the combined list of dictionaries to the template
         return {'combined_results': combined_results}
+class GuessResults1(GuessResults):
+    def is_displayed(self):
+        return self.player.results_order
 
+class GuessResults2(GuessResults):
+    def is_displayed(self):
+        return not self.player.results_order
 page_sequence = [
     GuessAnswerPage,
-    # NonMonGuessAnswerPage,
+    NonMonGuessAnswerPage,
+    GuessResults1,
+    Q1,
+    GuessResults2,
     # Feedback,
-    # Q1,
-    GuessResults,
     # FinalForProlific
 ]

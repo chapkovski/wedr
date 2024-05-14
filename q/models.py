@@ -41,21 +41,27 @@ class Player(BasePlayer):
             self.participant.vars['treatment'] = random.choice(wedr_constants.treatments)
             treatment = self.participant.vars['treatment']
             self.participant.vars['own_polq'] = {i.get('name'): random.randint(0, 5) for i in wedr_constants.polq_data
-                                                 if i.get('treatment') == treatment}
+                                                 }
             print(self.participant.vars['own_polq'])
             self.participant.vars['partner_polq'] = {i.get('name'): random.randint(0, 5) for i in
-                                                     wedr_constants.polq_data if i.get('treatment') == treatment}
+                                                     wedr_constants.polq_data}
             print(self.participant.vars['partner_polq'])
         self.treatment = self.participant.vars.get('treatment')
         self.own_polq = json.dumps(self.participant.vars.get('own_polq'))
         self.partner_polq = json.dumps(self.participant.vars.get('partner_polq'))
         print(f'Current treatment: {self.treatment}')
-
+    @property
+    def keys_needed(self):
+        data = wedr_constants.polq_data
+        return  [i.get('name') for i in data if i.get('treatment') == self.treatment]
     def set_payoffs(self):
         current_guess = json.loads(self.guess)
         partner_answers = json.loads(self.partner_polq)
+
+
+
         # let's match guess with actual answers
-        match = all(current_guess.get(key) == partner_answers.get(key) for key in current_guess)
+        match = all(current_guess.get(key) == partner_answers.get(key) for key in self.keys_needed)
         remuneration = self.session.config.get('payment_for_guess', 1.00)
         self.payoff = c(remuneration) if match else 0
 
@@ -63,6 +69,7 @@ class Player(BasePlayer):
     own_polq = models.StringField()
     partner_polq = models.StringField()
     guess = models.StringField()
+    results_order = models.BooleanField()
     # block of questions to keep partner's answers they all start with partner_
 
     partner_women = models.IntegerField()
