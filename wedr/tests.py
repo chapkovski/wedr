@@ -26,11 +26,11 @@ def generate_random_response():
         'immigration': list(range(0, 6)),  # Assuming scale 0-5
         'maritalStatus': ["Single (never married)", "Married, or in a domestic partnership", "Widowed", "Divorced",
                           "Separated"],
-        'partisanship': list(range(0, 6)),  # Assuming scale 0-5
+
         'women': list(range(0, 6)),  # Assuming scale 0-5,
         'books': list(range(0, 6)),
         'cars': list(range(0, 6)),
-        'cities': list(range(0, 6)),
+
         'climate_change': list(range(0, 6)),
         'healthy_eating': list(range(0, 6)),
     }

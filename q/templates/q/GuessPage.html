@@ -6,7 +6,16 @@
 {% endblock %}
 
 {% block content %}
-    <div class="alert alert-{{ view.alert.color }}">
+    <style>
+        .fixed {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 1030;
+        }
+    </style>
+    <div class="alert alert-{{ view.alert.color }} fixed">
     {%  autoescape off %}
         {{ view.alert.text }}
     {%  endautoescape %}

@@ -58,7 +58,7 @@ class PolPage(Page):
     def post(self):
         raw_data = self.request.POST.get('survey_data')
         try:
-
+            available_keys = [i['name'] for i in Constants.polq_data]
             json_data = json.loads(raw_data)
             data = Constants.polq_data.copy()
             response_mapping = Constants.response_mapping.copy()
@@ -80,7 +80,7 @@ class PolPage(Page):
                     )
 
             self.participant.vars['polq_data'] = res
-            self.participant.vars['own_polq'] = user_responses
+            self.participant.vars['own_polq'] = {k:v for k,v in user_responses.items() if k in available_keys}
 
 
         except JSONDecodeError as e:

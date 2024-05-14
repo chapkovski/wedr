@@ -33,6 +33,23 @@ pages:
           - Female
           - Other
           - Prefer not to say
+  - name: page_education
+    elements:
+      - type: radiogroup
+        name: education
+        title: What is the highest level of education you have completed?
+        isRequired: true
+        choices:
+          - No formal education
+          - Some high school, no diploma
+          - High school graduate, diploma or the equivalent (e.g., GED)
+          - Some college, no degree
+          - Associate degree
+          - Bachelor's degree
+          - Master's degree
+          - Professional degree (e.g., MD, JD)
+          - Doctorate (e.g., PhD, EdD)
+          - Prefer not to answer
   - name: page_maritalStatus
     elements:
       - type: radiogroup
@@ -68,15 +85,11 @@ pages:
         title: What is your annual household income?
         isRequired: true
         choices:
-          - "$1,000 - $2,000"
-          - "$2,000 - $5,000"
-          - "$5,000 - $10,000"
-          - "$10,000 - $25,000"
+          - "Less than $25,000"
           - "$25,000 - $50,000"
           - "$50,000 - $75,000"
           - "$75,000 - $100,000"
-          - "$100,000 - $150,000"
-          - "More than $150,000"
+          - "More than $100,000"
           - "Prefer not to answer"
   - name: intro_page
     elements:

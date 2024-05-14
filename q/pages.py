@@ -46,12 +46,12 @@ class Q1(Page):
 
 class _GuessPage(Page):
     template_name = 'q/GuessPage.html'
-
-    def get_rows(self):
+    @staticmethod
+    def get_rows(participant):
         raise NotImplementedError
 
     def js_vars(self):
-        rows = self.get_rows()
+        rows = self.get_rows(self.participant)
 
         # let's generate the list of value-text dicts from wedr_constants.polq_data based on partner_answers
 
@@ -62,6 +62,7 @@ class _GuessPage(Page):
         raw_data = self.request.POST.get('survey_data', {})
         try:
             json_data = json.loads(raw_data)
+            print(f'JSON data: {json_data}')
             partner_answers = json_data.get('partner_answers', {})
             full_guess = self.participant.vars.get('current_guess',{})
             full_guess.update(partner_answers)
@@ -81,10 +82,11 @@ class _GuessPage(Page):
 class GuessAnswerPage(_GuessPage):
     alert = dict(text="Remember that you will receive a bonus if you get all your partner's answers correct below.",
                  color='warning')
-
-    def get_rows(self):
+    @staticmethod
+    def get_rows(participant):
         rows = [dict(value=i.get('name'), text=i.get('text')) for i in wedr_constants.polq_data if
-                i.get('treatment') == self.participant.vars.get('treatment')]
+                i.get('treatment') == participant.vars.get('treatment')]
+        print(f'Rows: {rows}')
         return rows
     def before_next_page(self):
         self.player.guess = json.dumps(self.participant.vars.get('current_guess',{}))
@@ -94,10 +96,10 @@ class GuessAnswerPage(_GuessPage):
 class NonMonGuessAnswerPage(_GuessPage):
     alert = dict(text="Now we will ask you to guess your partner's answers to the rest of of the questions. <br>The correctness of the answers below <b>will not</b> affect your bonus.",
                  color='success')
-
-    def get_rows(self):
+    @staticmethod
+    def get_rows(participant):
         rows = [dict(value=i.get('name'), text=i.get('text')) for i in wedr_constants.polq_data if
-                i.get('treatment') !=self.participant.vars.get('treatment')]
+                i.get('treatment') !=participant.vars.get('treatment')]
         return rows
     def before_next_page(self):
         self.player.guess = json.dumps(self.participant.vars.get('current_guess', {}))
@@ -142,6 +144,6 @@ page_sequence = [
     GuessResults1,
     Q1,
     GuessResults2,
-    # Feedback,
-    # FinalForProlific
+    Feedback,
+    FinalForProlific
 ]

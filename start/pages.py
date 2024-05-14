@@ -62,9 +62,9 @@ class CQPage(Page):
 
 
 page_sequence = [
-    # Consent,
-    # Intro,
-    # Instructions1,
-    # Instructions2,
-    # CQPage,
+    Consent,
+    Intro,
+    Instructions1,
+    Instructions2,
+    CQPage,
 ]

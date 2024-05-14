@@ -172,7 +172,7 @@ class Group(BaseGroup):
 
     def set_treatment(self):
         self.treatment = Constants.treatments[self.id_in_subsession % 2]
-        qs = [q['name'] for q in Constants.polq_data ]
+        qs = [q['name'] for q in Constants.polq_data]
         print(f'qs: {qs}')
         for p in self.get_players():
             _qs = qs.copy()
@@ -196,6 +196,8 @@ class Group(BaseGroup):
         if self.round_number == 1:
             for p in self.get_players():
                 p.participant.vars['partner_polq'] = p.get_partner().participant.vars.get('own_polq')
+                p.own_polq = json.dumps(p.participant.vars.get('own_polq', {}))
+                p.partner_polq = json.dumps(p.participant.vars.get('partner_polq', {}))
             self.set_time_over()
         g = self
         # we need to encode the word and split the alphabet between the two players
@@ -246,6 +248,7 @@ class Player(BasePlayer):
             random.shuffle(_qs)
             self.participant.vars['qs'] = _qs
         self.qs_order = json.dumps(v.get('qs', []))
+
     """
     Choices:
 
@@ -254,12 +257,13 @@ Only B
 Only C
 A and B
 A, B, and C"""
-    guess_check= models.StringField(
+    guess_check = models.StringField(
         choices=['Only A', 'Only B', 'Only C', 'A and B', 'A, B, and C'],
         widget=widgets.RadioSelect
     )
+
     def guess_check_error_message(self, value):
-        if value!='A, B, and C':
+        if value != 'A, B, and C':
             return 'Please check your answer'
 
     qs_order = models.StringField()
@@ -271,20 +275,17 @@ A, B, and C"""
     completion_time = djmodels.DateTimeField(null=True)
     completed = models.BooleanField(default=False)
 
-    # political demographic quetionsnnaire fields: ['age', 'gender', 'maritalStatus', 'employmentStatus', 'householdIncome', 'women', 'partisanship', 'immigration', 'books', 'cities', 'cars']
     age = models.StringField()
     gender = models.StringField()
-    maritalStatus = models.StringField()
+
     employmentStatus = models.StringField()
     householdIncome = models.StringField()
     # polarizing
     women = models.StringField()
-    partisanship = models.StringField()
     immigration = models.StringField()
     climate_change = models.StringField()
     # neutral
     books = models.StringField()
-    cities = models.StringField()
     cars = models.StringField()
     healthy_eating = models.StringField()
 
