@@ -168,9 +168,9 @@ class IntroGuess(Page):
 
 page_sequence = [
     GameSettingWP,
-    IntroToPol,
-    PolPage,
-    IntroGuess,
+    # IntroToPol,
+    # PolPage,
+    # IntroGuess,
     PartnerWP,
     WorkingPage,
 
